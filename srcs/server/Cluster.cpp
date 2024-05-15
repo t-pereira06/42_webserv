@@ -115,20 +115,20 @@ void	Cluster::initServer()
 {
 	t_listen listenStruct;
 	int i = 0;
-	std::cout << BOLD << GREEN << "─────────────────────────[Parsing " << _config.getSvBlocks().size() << " server(s)]──────────────────────────" << RESET << std::endl;
+	std::cout << BOLD << RED << "─────────────────────────[Parsing " << _config.getSvBlocks().size() << " server(s)]──────────────────────────" << RESET << std::endl;
 	while (!_config.getSvBlocks().empty()) 
 	{
 		try
 		{
 			std::cout << "Server " << i + 1 << " \u2192 ";
 			std::cout.flush();
-			const char* loadingIcons[] = {"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"};
+			const char* loadingIcons[] = {"▁", "▃", "▄", "▅", "▆", "▇", "█"};
 			const int numIcons = sizeof(loadingIcons) / sizeof(loadingIcons[0]);
 			for (int j = 0; j < 10; ++j) 
 			{
 				std::cout << "\r" << BOLD << YELLOW << "Server " << i + 1 << " \u2192 " << loadingIcons[j % numIcons] << RESET;
 				std::cout.flush();
-				usleep(50000); // Sleep for 100 milliseconds (adjust as needed)
+				usleep(90000); // Sleep for 100 milliseconds (adjust as needed)
 			}
 			invertStack(_config.getSvBlocks());
 			createServer(listenStruct);
@@ -202,13 +202,13 @@ void	Cluster::createServer(t_listen& listenStruct)
 void Cluster::setupServer() 
 {
     invertVector(_servers);
-    std::cout << std::endl << BOLD << GREEN << "───────────────────────[Initializing " << _servers.size() << " server(s)]───────────────────────" << RESET << std::endl;
+    std::cout << std::endl << BOLD << RED << "───────────────────────[Initializing " << _servers.size() << " server(s)]───────────────────────" << RESET << std::endl;
 
     for (std::vector<Server*>::iterator it = _servers.begin(); it != _servers.end();) 
 	{
         try 
 		{
-            const char* loadingIcons[] = {"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"};
+            const char* loadingIcons[] = {"▁", "▃", "▄", "▅", "▆", "▇", "█"};
             const int numIcons = sizeof(loadingIcons) / sizeof(loadingIcons[0]);
             for (int j = 0; j < 10; ++j) 
 			{
@@ -216,7 +216,7 @@ void Cluster::setupServer()
 				{
                     std::cout << "\r" << BOLD << YELLOW << "Server " << (*it)->getDynamicListen().port << " \u2192 " << loadingIcons[j % numIcons] << RESET;
                     std::cout.flush();
-                    usleep(50000); // Sleep for 100 milliseconds (adjust as needed)
+                    usleep(90000); // Sleep for 100 milliseconds (adjust as needed)
                 }
             }
 
@@ -238,7 +238,7 @@ void Cluster::setupServer()
         }
     }
 
-    std::cout << std::endl << BOLD << GREEN << "─────────────────────────[Running " << _numberOfSv << " server(s)]──────────────────────────" << RESET << std::endl;
+    std::cout << std::endl << BOLD << RED << "─────────────────────────[Running " << _numberOfSv << " server(s)]──────────────────────────" << RESET << std::endl;
 }
 
 /* ===================== Server Monitoring and Cleanup Functions ===================== */
@@ -504,12 +504,12 @@ void	Cluster::connectionHandler(int fd, Server* server)
  */
 void Cluster::promptInfo() 
 {
-    std::cout << BOLD << CYAN << "─────────────────────────────────────────────────────────────────────────" << std::endl;
-    std::cout << "| " << BOLD << std::setw(20) << "Timestamp" << " | " 
-              << BOLD << std::setw(16) << "Server Name" << " | " 
-              << BOLD << std::setw(13) << "Address" << " | " 
-              << BOLD << std::setw(10) << "Port" << " |" << std::endl;
-    std::cout << "─────────────────────────────────────────────────────────────────────────" << RESET << std::endl;
+    std::cout << BOLD << RED << "─────────────────────────────────────────────────────────────────────────" << std::endl;
+    std::cout << "| " << RESET << BOLD << std::setw(20) << "Timestamp" << " | " 
+              << RESET << BOLD << std::setw(16) << "Server Name" << " | " 
+              << RESET << BOLD << std::setw(13) << "Address" << " | " 
+              << RESET << BOLD << std::setw(10) << "Port" << " |" << std::endl;
+    std::cout << RED << "─────────────────────────────────────────────────────────────────────────" << RESET << std::endl;
 	std::map<int, Server*>::iterator	it = _fdToServerMap.begin();
     for (; it != _fdToServerMap.end(); ++it) 
 	{

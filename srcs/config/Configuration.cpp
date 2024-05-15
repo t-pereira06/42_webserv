@@ -422,6 +422,7 @@ void Configuration::processLocationDir(std::vector<std::string>::iterator& it, s
  */
 void Configuration::checkLocations(Server* server, std::vector<std::string>& body, t_server_config& conf)
 {
+	(void)server;
     std::vector<std::string>::iterator it;
     if (checkKeywords(body) == -1)
         throw ConfigurationException("Invalid aliasor methods.");
@@ -458,7 +459,6 @@ void Configuration::checkLocations(Server* server, std::vector<std::string>& bod
             }
         }
     }
-    logger(server, conf);
 }
 
 /**
@@ -675,88 +675,7 @@ void	Configuration::checkDoubles(std::vector<std::string>& body)
 			throw ConfigurationException("Duplicate '" + mit->first + "' directive in config file.");
 }
 
-/* ===================== Logger Functions ===================== */
-
-/**
- * @brief Prints the parsed location map to a log file.
- *
- * @param server Pointer to the Server instance.
- * @param conf The server configuration structure containing the parsed locations.
- */
-void	Configuration::logger(Server* server, t_server_config& conf)
-{
-	std::string	logPath = "./logs/locales";
-	std::string	logFile = "./logs/locales/localgen.txt";
-	if (createDirectory(logPath.c_str()))
-	{
-		std::fstream outfile(logFile.c_str(), std::ios_base::app);
-		std::time_t timestamp = std::time(NULL);
-		char buff[50];
-		std::strftime(buff, sizeof(buff), "%Y-%m-%d %H:%M:%S", std::localtime(&timestamp));
-		if (!outfile.fail())
-		{
-			outfile << std::endl;
-			outfile << "================================================" << std::endl;
-			outfile << "#### SERVER PORT " << server->getListen().port << " " << buff << " ####" << std::endl << std::endl;
-			outfile << *server << std::endl;
-			outfile << "  ### LOCATIONS ###" << std::endl;
-			for (size_t i = 0; i < conf.locationStruct.size(); i++)
-			{
-				LocationDir* dir = dynamic_cast<LocationDir*>(conf.locationStruct[i]);
-				if (dir)
-				{
-					outfile << "Is File: False" << std::endl;
-					outfile << "	name: " << dir->name << std::endl;
-					outfile << "	redirect: " << dir->redirect << std::endl;
-					outfile << "	root: " << dir->root << std::endl;
-					outfile << "	index: ";
-					std::vector<std::string>::iterator it;
-					for (it = dir->index.begin(); it != dir->index.end(); it++)
-						outfile << *it << " ";
-					outfile << std::endl;	
-					outfile << "	alias: " << dir->alias << std::endl;
-					outfile << "	autoindex: " << (dir->autoindex ? "yes" : "no") << std::endl;
-					outfile << "	allow_methods: ";
-					for (it = dir->allow_methods.begin(); it != dir->allow_methods.end(); it++)
-						outfile << *it << " ";
-					outfile << std::endl;
-					for (size_t j = 0; j < dir->files.size(); j++)
-					{
-						outfile << "	Script:" << std::endl;
-						outfile << "		name: " << dir->files[j]->name << std::endl;
-						outfile << "		cgi_pass: " << dir->files[j]->cgi_pass << std::endl;
-						outfile << "		allow_methods: ";
-						for (it = dir->files[j]->allow_methods.begin(); it != dir->files[j]->allow_methods.end(); it++)
-							outfile << *it << " ";
-						outfile << std::endl;
-					}
-					outfile << std::endl;
-				}
-				else
-				{
-					LocationFiles* files = dynamic_cast<LocationFiles*>(conf.locationStruct[i]);
-					if (files)
-					{
-						std::vector<std::string>::iterator it;
-						outfile << "Is File: True" << std::endl;
-						outfile << "	name: " << files->name << std::endl;
-						outfile << "	cgi_pass: " << files->cgi_pass << std::endl;
-						outfile << "	allow_methods: ";
-						for (it = files->allow_methods.begin(); it != files->allow_methods.end(); it++)
-							outfile << *it << " ";
-						outfile << std::endl;
-					}
-				}
-			}
-		}
-		outfile.close();
-	}
-	else throw ConfigurationException("Failed to create logs.");
-}
-
-
 /* ===================== Exceptions ===================== */
-
 
 Configuration::ConfigurationException::ConfigurationException(const std::string& error)
 {

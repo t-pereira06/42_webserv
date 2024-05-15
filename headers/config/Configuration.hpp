@@ -50,7 +50,6 @@ class Configuration {
 		int		checkKeywords(std::vector<std::string>& body);
 		int		setKeywords(std::string type, std::vector<std::string> key, BaseLocation& strc);
 		void	checkDoubles(std::vector<std::string>& body);
-		void	logger(Server* server, t_server_config& conf);
 
 		class ConfigurationException : public std::exception
 		{
