@@ -20,20 +20,20 @@ extern bool chunky;
 Cluster::Cluster() : _numberOfSv() {}
 
 Cluster::Cluster(const Cluster& original) : _numberOfSv(),
-	 _servers(original._servers) /*, _config(original._config)*/ {
+	_servers(original._servers) /*, _config(original._config)*/ {}
 
-}
-
-Cluster& Cluster::operator=(const Cluster& original) {
-	if (this != &original) {
+Cluster& Cluster::operator=(const Cluster& original) 
+{
+	if (this != &original) 
 		_servers = original._servers;
-	}
 	return *this;
 }
 
-Cluster::~Cluster() {
+Cluster::~Cluster() 
+{
 	std::vector<pollfd>::iterator	it;
-	for (it = _pollFDs.end() - 1; it != _pollFDs.begin() - 1; --it) {
+	for (it = _pollFDs.end() - 1; it != _pollFDs.begin() - 1; --it) 
+	{
 		close(it->fd);
 		_pollFDs.erase(it);
 	}
@@ -51,7 +51,8 @@ Cluster::~Cluster() {
  *
  * @param filepath The path to the server configuration file.
  */
-Cluster::Cluster(const std::string& filepath) : _numberOfSv(0), _config(filepath) {
+Cluster::Cluster(const std::string& filepath) : _numberOfSv(0), _config(filepath) 
+{
 	initServer();
 }
 
@@ -60,11 +61,14 @@ Cluster::Cluster(const std::string& filepath) : _numberOfSv(0), _config(filepath
 /**
  * @brief Sets the poll file descriptors for all servers.
  */
-void	Cluster::setPollFD() {
+void	Cluster::setPollFD() 
+{
 	_pollFDs.reserve(_servers.size());
 	std::vector<Server*>::iterator it;
-	for (it = _servers.begin(); it != _servers.end(); it++) {
-		if (it != _servers.end() && (*it)->getServerStatus()) {
+	for (it = _servers.begin(); it != _servers.end(); it++) 
+	{
+		if (it != _servers.end() && (*it)->getServerStatus()) 
+		{
 			pollfd pfd;
 			pfd.fd = (*it)->getFD();
 			pfd.events = POLLIN; //read events
@@ -77,15 +81,18 @@ void	Cluster::setPollFD() {
 
 /* ===================== Getter functions ===================== */
 
-std::vector<Server*>& Cluster::getServers() {
+std::vector<Server*>& Cluster::getServers() 
+{
 	return (_servers);
 }
 
-Server* Cluster::getServer() {
+Server* Cluster::getServer() 
+{
 	return (_servers.back());
 }
 
-Server* Cluster::getServer(int fd) {
+Server* Cluster::getServer(int fd) 
+{
 	std::vector<Server*>::iterator it;
 	for (it = _servers.begin(); it != _servers.end(); ++it)
 		if (fd == (*it)->getFD())
@@ -104,17 +111,21 @@ Server* Cluster::getServer(int fd) {
  * If any errors occur during server initServer, it catches exceptions, displays an error message, and clears the server.
  * After setting up all servers, it establishes server sockets, configures poll file descriptors, and displays server information.
  */
-void	Cluster::initServer() {
+void	Cluster::initServer() 
+{
 	t_listen listenStruct;
 	int i = 0;
 	std::cout << BOLD << GREEN << "─────────────────────────[Parsing " << _config.getSvBlocks().size() << " server(s)]──────────────────────────" << RESET << std::endl;
-	while (!_config.getSvBlocks().empty()) {
-		try{
+	while (!_config.getSvBlocks().empty()) 
+	{
+		try
+		{
 			std::cout << "Server " << i + 1 << " \u2192 ";
 			std::cout.flush();
 			const char* loadingIcons[] = {"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"};
 			const int numIcons = sizeof(loadingIcons) / sizeof(loadingIcons[0]);
-			for (int j = 0; j < 10; ++j) {
+			for (int j = 0; j < 10; ++j) 
+			{
 				std::cout << "\r" << BOLD << YELLOW << "Server " << i + 1 << " \u2192 " << loadingIcons[j % numIcons] << RESET;
 				std::cout.flush();
 				usleep(50000); // Sleep for 100 milliseconds (adjust as needed)
@@ -124,7 +135,9 @@ void	Cluster::initServer() {
 			configureServer(_servers.back());
 			std::cout << "\r" << BOLD << GREEN << "Server " << i + 1 << ": " << CYAN << listenStruct.port << GREEN <<" \u2192 \u2713" << RESET << std::endl; // Unicode check mark symbol
 			i++;
-		} catch (std::exception &e) {
+		} 
+		catch (std::exception &e) 
+		{
 			std::cout << "\r" << BOLD << RED << "Server " << i + 1 << ": " << listenStruct.port << " \u2192 \u2717 : " << RESET; // Unicode cross symbol
 			std::cout << e.what() << std::endl;
 			clearServer();
@@ -145,7 +158,8 @@ void	Cluster::initServer() {
  * 
  * @param server A pointer to the server instance to be parsed and configured.
  */
-void	Cluster::configureServer(Server* server) {
+void	Cluster::configureServer(Server* server) 
+{
 	callerSemicolon(server);
 	callerDoubles(server);
 	callerServerName(server);
@@ -169,7 +183,8 @@ void	Cluster::configureServer(Server* server) {
  * 
  * @param listenStruct A reference to the structure containing the listen configuration for the new server.
  */
-void	Cluster::createServer(t_listen& listenStruct) {
+void	Cluster::createServer(t_listen& listenStruct) 
+{
 	callerListen(_config.getSvBlocks().top(), listenStruct);
 	_servers.push_back(new Server(listenStruct));
 	std::istringstream iss(_config.getSvBlocks().top());
@@ -184,29 +199,37 @@ void	Cluster::createServer(t_listen& listenStruct) {
  * of a server, a check mark symbol is displayed. If an error occurs during initialization, a cross symbol is displayed
  * along with the error message, and the server is removed from the cluster.
  */
-void Cluster::setupServer() {
+void Cluster::setupServer() 
+{
     invertVector(_servers);
     std::cout << std::endl << BOLD << GREEN << "───────────────────────[Initializing " << _servers.size() << " server(s)]───────────────────────" << RESET << std::endl;
 
-    for (std::vector<Server*>::iterator it = _servers.begin(); it != _servers.end();) {
-        try {
+    for (std::vector<Server*>::iterator it = _servers.begin(); it != _servers.end();) 
+	{
+        try 
+		{
             const char* loadingIcons[] = {"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"};
             const int numIcons = sizeof(loadingIcons) / sizeof(loadingIcons[0]);
-            for (int j = 0; j < 10; ++j) {
-                if (*it) {
+            for (int j = 0; j < 10; ++j) 
+			{
+                if (*it) 
+				{
                     std::cout << "\r" << BOLD << YELLOW << "Server " << (*it)->getDynamicListen().port << " \u2192 " << loadingIcons[j % numIcons] << RESET;
                     std::cout.flush();
                     usleep(50000); // Sleep for 100 milliseconds (adjust as needed)
                 }
             }
 
-            if (*it) {
+            if (*it) 
+			{
                 (*it)->initServer();
                 std::cout << "\r" << BOLD << GREEN << "Server " << (*it)->getDynamicListen().port << " \u2192 \u2713" << RESET << std::endl; // Unicode check mark symbol
                 // UPDATE TO OK
                 ++it; // Move to the next iterator position
             }
-        } catch (std::exception &e) {
+        } 
+		catch (std::exception &e) 
+		{
             std::cout << "\r" << BOLD << RED << "Server " << (*it)->getDynamicListen().port << " \u2192 \u2717 : " << RESET; // Unicode cross symbol
             std::cerr << e.what() << std::endl;
             _numberOfSv--;
@@ -227,8 +250,10 @@ void Cluster::setupServer() {
  * from the '_config' object. It deletes the server object to free up memory and pops it from the vector.
  * If there are no servers or server blocks left, the function does nothing.
  */
-void	Cluster::clearServer() {
-	if (!_servers.empty()) {
+void	Cluster::clearServer() 
+{
+	if (!_servers.empty()) 
+	{
 		while (!_servers.back()->getDynamicBody().empty())
 			_servers.back()->getDynamicBody().pop_back();
 		delete _servers.back();
@@ -249,7 +274,8 @@ void	Cluster::clearServer() {
  * @param event_buffer The buffer containing epoll events.
  * @return Returns 0 if no sockets have been closed, 2 if an inactive connection has been closed.
  */
-int Cluster::checkTimeout(int epoll_fd, struct epoll_event* event_buffer) {
+int Cluster::checkTimeout(int epoll_fd, struct epoll_event* event_buffer) 
+{
 
 	// Get current system time
 	time_t now = time(NULL);
@@ -258,12 +284,13 @@ int Cluster::checkTimeout(int epoll_fd, struct epoll_event* event_buffer) {
 	// Skip first N positions on map so not to close base servers
 	std::advance(it, _numberOfSv);
 
-	for (; it != _fdToServerMap.end(); ++it) {
+	for (; it != _fdToServerMap.end(); ++it) 
+	{
 		int fd = it->first;
 
 		// Check if last activity time for each server is initialized and if it's passed the allowed lifetime
-		if (_activityTime[fd] && now - _activityTime[fd] > ACTIVITY_TIMEOUT) {
-			
+		if (_activityTime[fd] && now - _activityTime[fd] > ACTIVITY_TIMEOUT) 
+		{
 			// Inactive connection found, remove from event_buffer
 			it->second->closeConnections(fd, epoll_fd, event_buffer, _fdToServerMap, _activityTime);
 			return (2);
@@ -276,24 +303,29 @@ int Cluster::checkTimeout(int epoll_fd, struct epoll_event* event_buffer) {
 
 /* ===================== Configuration Parser Caller Functions ===================== */
 
-void	Cluster::callerSemicolon(Server* server) {
+void	Cluster::callerSemicolon(Server* server) 
+{
 	_config.checkSemicolon(server->getDynamicBody());
 }
 
-void	Cluster::callerDoubles(Server *server) {
+void	Cluster::callerDoubles(Server *server) 
+{
 	_config.checkDoubles(server->getDynamicBody());
 }
 
-void	Cluster::callerServerName(Server* server) {
+void	Cluster::callerServerName(Server* server) 
+{
 	_config.checkSvName(server->getDynamicBody(), server->getDynamicConfig());
 }
 
-void	Cluster::callerListen(std::string& wordStack, t_listen &listen) {
+void	Cluster::callerListen(std::string& wordStack, t_listen &listen) 
+{
 	std::istringstream iss(wordStack);
-	_config.checkListen(iss, listen);
+	_config.processListen(iss, listen);
 }
 
-void	Cluster::callerServerRoot(Server* server) {
+void	Cluster::callerServerRoot(Server* server) 
+{
 	_config.checkSvRoot(server->getDynamicBody(), server->getDynamicConfig());
 }
 
@@ -302,19 +334,23 @@ void Cluster::callerErrorPage(Server* server)
 	_config.checkErrPage(server->getDynamicBody(), server->getDynamicConfig());
 }
 
-void	Cluster::callerIndex(Server* server) {
+void	Cluster::callerIndex(Server* server) 
+{
 	_config.checkIndex(server->getDynamicBody(), server->getDynamicConfig());
 }
 
-void	Cluster::callerMethods(Server* server) {
+void	Cluster::callerMethods(Server* server) 
+{
 	_config.checkMethods(server->getDynamicBody(), server->getDynamicConfig());
 }
 
-void	Cluster::callerClientSize(Server* server) {
+void	Cluster::callerClientSize(Server* server) 
+{
 	_config.checkClientBodySize(server->getDynamicBody(), server->getDynamicConfig());
 }
 
-void	Cluster::callerLocations(Server* server) {
+void	Cluster::callerLocations(Server* server) 
+{
 	_config.checkLocations(server, server->getDynamicBody(), server->getDynamicConfig());
 }
 
@@ -327,8 +363,10 @@ void	Cluster::callerLocations(Server* server) {
  * and manages incoming connections. It listens for incoming events and delegates
  * connection handling to the appropriate server instances.
  */
-void	Cluster::startServers() {
-	try {
+void	Cluster::startServers() 
+{
+	try 
+	{
 
 		int epoll_fd = epoll_create(_numberOfSv);
 		int numEvents;
@@ -338,7 +376,8 @@ void	Cluster::startServers() {
 		events.events = EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLHUP;
 
 		// Create and link each base server socket to their corresponding servers via map
-		for (size_t i = 0; i < _pollFDs.size(); i++) {
+		for (size_t i = 0; i < _pollFDs.size(); i++) 
+		{
 			events.data.fd = _pollFDs[i].fd;
 			_fdToServerMap[_pollFDs[i].fd] = getServer(_pollFDs[i].fd);
 			_serverSockets.push_back(_pollFDs[i].fd);
@@ -347,32 +386,38 @@ void	Cluster::startServers() {
 		}
 
 		// Main Servers Listen
-		while (!gSignalStatus) {
+		while (!gSignalStatus) 
+		{
 
 			// Wait for an event/request
 			numEvents = epoll_wait(epoll_fd, event_buffer, 10, 5000);
-			if (numEvents < 0) {
+			if (numEvents < 0) 
+			{
 				if (WIFSIGNALED(gSignalStatus))
 					return ; //check favicon < 0
 				throw ClusterException("EPOLL_WAIT Failed");
 			}
 
 			// Create a buffer for each server socket that manages events
-			for (int i = 0; i < numEvents; i++) {
+			for (int i = 0; i < numEvents; i++) 
+			{
 
 				// First N times, client socket will be each servers base socket
 				int client_socket = event_buffer[i].data.fd;
-				if(event_buffer[i].events & EPOLLERR) {
+				if(event_buffer[i].events & EPOLLERR) 
+				{
 					std::cerr << "EPOLLERR event on fd " << client_socket << std::endl;
 					close(event_buffer[i].data.fd);
 					continue;
 				}
-				else if(event_buffer[i].events & EPOLLHUP) {
+				else if(event_buffer[i].events & EPOLLHUP) 
+				{
 					std::cerr << "EPOLLHUP event on fd " << client_socket << std::endl;
 					close(event_buffer[i].data.fd);
 					continue;
 				}
-				else if (std::find(_serverSockets.begin(), _serverSockets.end(), client_socket) != _serverSockets.end()) {
+				else if (std::find(_serverSockets.begin(), _serverSockets.end(), client_socket) != _serverSockets.end()) 
+				{
 					struct sockaddr_in client_address;
 					socklen_t addrlen = sizeof(sockaddr);
 
@@ -393,12 +438,16 @@ void	Cluster::startServers() {
 					if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_socket, &event_buffer[i]) < 0)
 						throw ClusterException("Failed controlling epoll for connection_fd::" + intToStr(client_socket));
 				}
-				else {
+				else 
+				{
 					// Added try catch if need to do any throws on connection (request <-> response) process
-					try {
+					try 
+					{
 						if(event_buffer[i].events & EPOLLIN)
 							connectionHandler(client_socket, _fdToServerMap[client_socket]);
-					} catch (std::exception &e) {
+					} 
+					catch (std::exception &e) 
+					{
 						_fdToServerMap[client_socket]->closeConnections(client_socket, epoll_fd, event_buffer, _fdToServerMap, _activityTime);
 						std::cerr << e.what() << std::endl;
 					}
@@ -409,17 +458,21 @@ void	Cluster::startServers() {
 				}
 			}
 		}
-	} catch (const std::exception &e) {
+	} 
+	catch (const std::exception &e) 
+	{
 		std::cerr << e.what() << std::endl;
 		clearServer();
 	}
 }
 
-class MatchFd {
+class MatchFd 
+{
     int _fd;
 public:
     MatchFd(int fd) : _fd(fd) {}
-    bool operator()(const Connection& c) const {
+    bool operator()(const Connection& c) const 
+	{
         return c.getConnectionFD() == _fd;
     }
 };
@@ -433,11 +486,11 @@ public:
  * @param fd The file descriptor of the incoming connection.
  * @param server Pointer to the server instance handling the connection.
  */
-void	Cluster::connectionHandler(int fd, Server* server) {
+void	Cluster::connectionHandler(int fd, Server* server) 
+{
 	_activityTime[fd] = time(NULL);
-	if (std::find_if(server->getConnectionVector().begin(), server->getConnectionVector().end(), MatchFd(fd)) == server->getConnectionVector().end()) {
+	if (std::find_if(server->getConnectionVector().begin(), server->getConnectionVector().end(), MatchFd(fd)) == server->getConnectionVector().end())
 		server->setConnection(fd);
-	}
 	server->sender(fd);
 }
 
@@ -449,7 +502,8 @@ void	Cluster::connectionHandler(int fd, Server* server) {
  * This function prints a formatted table containing details about each server, including
  * the timestamp, server name, address, and port.
  */
-void Cluster::promptInfo() {
+void Cluster::promptInfo() 
+{
     std::cout << BOLD << CYAN << "─────────────────────────────────────────────────────────────────────────" << std::endl;
     std::cout << "| " << BOLD << std::setw(20) << "Timestamp" << " | " 
               << BOLD << std::setw(16) << "Server Name" << " | " 
@@ -457,7 +511,8 @@ void Cluster::promptInfo() {
               << BOLD << std::setw(10) << "Port" << " |" << std::endl;
     std::cout << "─────────────────────────────────────────────────────────────────────────" << RESET << std::endl;
 	std::map<int, Server*>::iterator	it = _fdToServerMap.begin();
-    for (; it != _fdToServerMap.end(); ++it) {
+    for (; it != _fdToServerMap.end(); ++it) 
+	{
 		Server* server = it->second;
         std::time_t timestamp = std::time(NULL);
         char buff[50];
@@ -475,14 +530,16 @@ void Cluster::promptInfo() {
 
 /* ===================== Exceptions ===================== */
 
-Cluster::ClusterException::ClusterException(const std::string& error) {
+Cluster::ClusterException::ClusterException(const std::string& error) 
+{
 	_errMessage = "Error: " + error;
 }
 
 Cluster::ClusterException::~ClusterException() throw() {}
 
 
-const char *Cluster::ClusterException::what() const throw() {
+const char *Cluster::ClusterException::what() const throw() 
+{
 	return (_errMessage.c_str());
 }
 

@@ -19,7 +19,8 @@
 
 class Server;
 
-class Request {
+class Request
+{
 
 	private:		
 		std::string _method;
@@ -36,7 +37,6 @@ class Request {
 		std::string _file;
 		std::string _host;
 
-
 	public:
 		bool		_isChunked;
 		bool		_isRequestComplete;
@@ -46,7 +46,6 @@ class Request {
 		~Request();
 		int		fillHeader(int socket);
 		int		fillAttributes(const std::string& request);
-		void	parseChunked(int fd);
 		void	parseRequest();
 		std::string trimValue(std::string toBeTrimmed);
 		std::string parseFilename(std::string ClearDisposition);
@@ -68,7 +67,8 @@ class Request {
 		void	reqLogger(std::string request);
 		int		checkClientBodySize(Server* server);
 		
-		class RequestException : public std::exception {
+		class RequestException : public std::exception
+		{
 			private:
 				std::string _errMessage;
 			public:

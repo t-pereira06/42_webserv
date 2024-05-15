@@ -6,10 +6,10 @@ url = 'http://localhost:8002/cgi-bin/chunker.py'  # Replace with the path to you
 
 def chunked_generator():
 
-    data = ['This', ' is', ' a', ' chunked', ' request',
-            'This', ' is', ' a', ' longer', ' chunked', ' request',
-            'This', ' is', ' a', ' very', ' long', ' chunked', ' request',
-            'Thisaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', ' is', ' a', ' very', ' very', ' long', ' chunked', ' request']
+    data = ['This', ' is', ' a', ' chunked', ' request!',
+            'This', ' is', ' a', ' longer', ' chunked', ' request!',
+            'This', ' is', ' a', ' very', ' long', ' chunked', ' request!',
+            '	', ' is', ' a', ' very', ' very', ' long', ' chunked', ' request!']
 
     for item in data:
 

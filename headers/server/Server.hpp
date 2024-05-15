@@ -42,7 +42,8 @@ class Response;
  *   and functions that deal with internet addresses. It represents the address
  *   and port information of the server.
  */
-class Server {
+class Server
+{
 
 	private:
 		Server();
@@ -98,7 +99,8 @@ class Server {
 		int		bracketChecker();
 		int		bodyFiller(std::istringstream& iss);
 
-		class ServerException : public std::exception {
+		class ServerException : public std::exception
+		{
 			private:
 				std::string _errMessage;
 			public:

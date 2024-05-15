@@ -18,7 +18,8 @@
  * @param str The string to be checked.
  * @return true if the string represents a numeric value, false otherwise.
  */
-bool isNumeric(std::string str) {
+bool isNumeric(std::string str) 
+{
 	for (size_t i = 0; i < str.length(); i++)
 		if (!std::isdigit(str[i]))
 			return false;
@@ -30,7 +31,8 @@ bool isNumeric(std::string str) {
  *
  * @param str The string from which the substring is to be removed.
  */
-void	eraseSemicolon(std::string &str) {
+void	eraseSemicolon(std::string &str) 
+{
 	size_t i = str.find(" ;");
 	if (i != std::string::npos)
 		str.erase(i, 2);
@@ -42,11 +44,13 @@ void	eraseSemicolon(std::string &str) {
  * @param addr The string representation of the IP address.
  * @return The unsigned integer representation of the IP address.
  */
-unsigned int	convertIP(const std::string& addr) {
+unsigned int	convertIP(const std::string& addr) 
+{
 	std::istringstream iss(addr);
 	std::string token;
 	unsigned int result = 0;
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < 4; i++) 
+	{
 		if (!std::getline(iss, token, '.') || token.empty())
 			return (0);
 		int octet = atoi(token.c_str());
@@ -63,7 +67,8 @@ unsigned int	convertIP(const std::string& addr) {
  * @param addr The unsigned integer representation of the IP address.
  * @return The string representation of the IP address.
  */
-std::string ipToStr(unsigned int addr) {
+std::string ipToStr(unsigned int addr) 
+{
     std::ostringstream oss;
     oss << ((addr >> 24) & 0xFF) << '.' << ((addr >> 16) & 0xFF) << '.' << ((addr >> 8) & 0xFF) << '.' << (addr & 0xFF);
     if (oss.str() == "0.0.0.0")
@@ -81,17 +86,24 @@ std::string ipToStr(unsigned int addr) {
  */
 std::vector<std::string> extractValues(std::vector<std::string>::iterator& it, const std::vector<std::string>& body, bool IsDir) {
 	std::vector<std::string> values;
-	if (IsDir) {
-		if (*it == "location" && ((*(it + 1)).find("*") != std::string::npos || (*(it + 1)).find(".") != std::string::npos)) {
-			while (it != body.end() && *it != "}") {
+	if (IsDir) 
+	{
+		if (*it == "location" && ((*(it + 1)).find("*") != std::string::npos || (*(it + 1)).find(".") != std::string::npos)) 
+		{
+			while (it != body.end() && *it != "}") 
+			{
 				if (*it == "{" || *it == "}")
 					it++;
 				values.push_back(*it);
 				it++;
 			}
-		} else {
-			while (it != body.end() && *it != ";") {
-				if (*it == "{" || *it == "}") {
+		} 
+		else 
+		{
+			while (it != body.end() && *it != ";") 
+			{
+				if (*it == "{" || *it == "}")
+				{
 					if (*it == "}")
 						break ;
 					it++;
@@ -101,8 +113,10 @@ std::vector<std::string> extractValues(std::vector<std::string>::iterator& it, c
 			}
 		}
 	}
-	else {
-		while (it != body.end() && *it != "}") {
+	else 
+	{
+		while (it != body.end() && *it != "}") 
+		{
 			if (*it == "{" || *it == "}")
 					it++;
 			values.push_back(*it);
@@ -118,7 +132,8 @@ std::vector<std::string> extractValues(std::vector<std::string>::iterator& it, c
  * @param number The integer to be converted.
  * @return The string representation of the integer.
  */
-std::string intToStr(int number) {
+std::string intToStr(int number) 
+{
 	char buffer[20];
 	sprintf(buffer, "%d", number);
 	return (std::string(buffer));
@@ -130,7 +145,8 @@ std::string intToStr(int number) {
  * @param path The path of the directory to be created.
  * @return true if the directory is created successfully, false otherwise.
  */
-bool createDirectory(const char *path) {
+bool createDirectory(const char *path) 
+{
 	struct stat st;
 	if (stat(path, &st) == 0)
 		return true;
@@ -144,7 +160,8 @@ bool createDirectory(const char *path) {
  *
  * @return std::map<std::string, std::string> containing keyword mappings.
  */
-std::map<std::string, std::string> createLocalKeyMap() {
+std::map<std::string, std::string> createLocalKeyMap() 
+{
 	std::map<std::string, std::string> keyMap;
 	keyMap.insert(std::make_pair("dir", "allow_methods root redirect alias index autoindex"));
 	keyMap.insert(std::make_pair("file", "allow_methods cgi_pass"));

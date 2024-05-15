@@ -33,26 +33,27 @@ class Configuration {
 		Configuration(const Configuration& original);
 		Configuration& operator=(const Configuration& original);
 		~Configuration();
-
 		std::stack<std::string>& getSvBlocks();
 		void setSvBlocks(std::ifstream& file);
-
 		void	checkSemicolon(std::vector<std::string>& body);
 		void	checkSvName(std::vector<std::string>& body, t_server_config& conf);
-		void	checkListen(std::istringstream& iss, t_listen& listen);
+		void	processListen(std::istringstream& iss, t_listen& listen);
 		void	checkSvRoot(std::vector<std::string>& body, t_server_config& conf);
 		void	checkErrPage(std::vector<std::string>& body, t_server_config& conf);
 		void	checkIndex(std::vector<std::string>& body, t_server_config& conf);
 		void	checkMethods(std::vector<std::string>& body, t_server_config& conf);
 		void	checkClientBodySize(std::vector<std::string> &body, t_server_config &conf);
 		void	checkLocations(Server* server, std::vector<std::string>& body, t_server_config& conf);
+		void	processLocationDir(std::vector<std::string>::iterator& it, std::vector<std::string>& body, t_server_config& conf);
+		int		setKeywordsDir(std::vector<std::string> values, BaseLocation& strc);
+		int		setKeywordsFile(std::vector<std::string> values, BaseLocation& strc);
 		int		checkKeywords(std::vector<std::string>& body);
 		int		setKeywords(std::string type, std::vector<std::string> key, BaseLocation& strc);
 		void	checkDoubles(std::vector<std::string>& body);
 		void	logger(Server* server, t_server_config& conf);
 
-
-		class ConfigurationException : public std::exception {
+		class ConfigurationException : public std::exception
+		{
 			private:
 				std::string _errMessage;
 			public:

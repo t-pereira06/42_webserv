@@ -2,7 +2,8 @@
 
 /* ===================== Temporary Directory Listing Function ===================== */
 
-int createListHTML(std::string location, std::ofstream& file) {
+int createListHTML(std::string location, std::ofstream& file) 
+{
     file << "<!DOCTYPE html> \n"
          << "  <html lang=\"en\">\n"
          << "  <head>\n"
@@ -112,9 +113,11 @@ int createListHTML(std::string location, std::ofstream& file) {
     DIR *dir;
     struct dirent *entry;
     int fileCounter = 0;
-    if ((dir = opendir(location.c_str())) != NULL) {
+    if ((dir = opendir(location.c_str())) != NULL) 
+    {
         // Read directory entries
-        while ((entry = readdir(dir)) != NULL) {
+        while ((entry = readdir(dir)) != NULL) 
+        {
             // Skip '.' and '..'
             if (std::string(entry->d_name) == "." || std::string(entry->d_name) == "..")
                 continue;
@@ -125,7 +128,9 @@ int createListHTML(std::string location, std::ofstream& file) {
         }
         // Close the directory
         closedir(dir);
-    } else {
+    } 
+    else 
+    {
         // Error handling if unable to open directory
         std::cerr << "Error: Unable to open directory " << location << std::endl;
         return -1;

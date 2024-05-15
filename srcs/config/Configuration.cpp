@@ -14,44 +14,56 @@
 
 /* ===================== Orthodox Canonical Form ===================== */
 
-Configuration::Configuration() {}
+Configuration::Configuration()
+{
+}
 
-Configuration::Configuration(const Configuration& original) {
+Configuration::Configuration(const Configuration& original)
+{
 	_svBlocks = original._svBlocks;
 }
 
-Configuration& Configuration::operator=(const Configuration& original) {
+Configuration& Configuration::operator=(const Configuration& original)
+{
 	_svBlocks = original._svBlocks;
 	return (*this);
 }
 
-Configuration::~Configuration() {
+Configuration::~Configuration()
+{
 	_ports.clear();
 }
 
 /* ===================== Constructors ===================== */
 
-Configuration::Configuration(const std::string& path) {
-	try {
+Configuration::Configuration(const std::string& path)
+{
+	try
+	{
 		std::ifstream file(path.c_str());
 		if (!file.is_open())
 			throw ConfigurationException("File not accessible.");
 		setSvBlocks(file);
-		} catch (std::exception &e) {
-			std::cout << e.what() << std::endl;
+	} 
+	catch (std::exception &e)
+	{
+		std::cout << e.what() << std::endl;
 	}
 }
 
 /* ===================== Getter Functions ===================== */
 
-std::stack<std::string>& Configuration::getSvBlocks() {
+std::stack<std::string>& Configuration::getSvBlocks()
+{
 	return (_svBlocks);
 }
 
 /* ===================== Setter Functions ===================== */
 
-struct IsSpace {
-    bool operator()(char c) const {
+struct IsSpace
+{
+    bool operator()(char c) const
+	{
         return std::isspace(c) && c != ' ';
     }
 };
@@ -69,21 +81,27 @@ struct IsSpace {
  *                             the number of opening and closing curly braces
  *                             does not match.
  */
-void	Configuration::setSvBlocks(std::ifstream& file) {
-	try {
+void	Configuration::setSvBlocks(std::ifstream& file)
+{
+	try
+	{
 		std::string	line, buffer;
 		int	flag = 0, openBracket = 0, closeBracket = 0;
-		while (std::getline(file, line)) {
+		while (std::getline(file, line))
+		{
 			std::replace_if(line.begin(), line.end(), IsSpace(), ' ');
-			if (line.find("server_name") != std::string::npos && flag < 2) {
+			if (line.find("server_name") != std::string::npos && flag < 2)
+			{
 				buffer += line;
 				flag++;
 			}
-			else if (line.find("server") != std::string::npos && flag < 1) {
+			else if (line.find("server") != std::string::npos && flag < 1)
+			{
 				buffer += line;
 				flag++;
 			}
-			else if (line.find("server") != std::string::npos && flag <= 2) {
+			else if (line.find("server") != std::string::npos && flag <= 2)
+			{
 				openBracket += std::count(buffer.begin(), buffer.end(), '{');
 				closeBracket += std::count(buffer.begin(), buffer.end(), '}');
 				if (openBracket != closeBracket)
@@ -99,12 +117,13 @@ void	Configuration::setSvBlocks(std::ifstream& file) {
 		_svBlocks.push(buffer);
 		buffer.clear();
 		file.close();
-	} catch (std::exception &e) {
+	}
+	catch (std::exception &e)
+	{
     	std::cout << e.what() << std::endl;
 		file.close();
 	}
 }
-
 
 /* ===================== Configurator Directive Functions ===================== */
 
@@ -113,7 +132,8 @@ void	Configuration::setSvBlocks(std::ifstream& file) {
  *
  * @param body The body of the configuration to parse.
  */
-void	Configuration::checkSemicolon(std::vector<std::string>& body) {
+void	Configuration::checkSemicolon(std::vector<std::string>& body)
+{
 	std::vector<std::string>::iterator it;
 	std::istringstream keywords(KEYWORDS);
 	std::string word;
@@ -138,13 +158,15 @@ void	Configuration::checkSemicolon(std::vector<std::string>& body) {
 void	Configuration::checkSvName(std::vector<std::string>& body, t_server_config& conf)
 {
 	std::vector<std::string>::iterator it;
-
-	for (it = body.begin(); it != body.end(); it++) {
-		if (*it == "location") {
+	for (it = body.begin(); it != body.end(); it++)
+	{
+		if (*it == "location")
+		{
 			conf.server_name.push_back("_");
 			break;
 		}
-		else if (*it == "server_name") {
+		else if (*it == "server_name")
+		{
 			it++;
 			while (*it != ";") {
 				conf.server_name.push_back(*it);
@@ -159,7 +181,6 @@ void	Configuration::checkSvName(std::vector<std::string>& body, t_server_config&
 		throw ConfigurationException("No server name defined in server block.");
 }
 
-
 /**
  * @brief Parses the listen directive from the configuration body, extracting host and port information.
  *
@@ -169,11 +190,14 @@ void	Configuration::checkSvName(std::vector<std::string>& body, t_server_config&
  * @param listen The structure to store the parsed listen configuration.
  * @throw ConfigurationException If there are errors in the configuration format, such as invalid port numbers or host addresses.
  */
-void Configuration::checkListen(std::istringstream& iss, t_listen& listen) {
+void Configuration::processListen(std::istringstream& iss, t_listen& listen)
+{
 	std::string word, address, temp_str;
 	size_t pos;
-	while (iss >> word) {
-		if (word == "listen") {
+	while (iss >> word)
+	{
+		if (word == "listen")
+		{
 			iss >> address;
 			pos = address.find(":");
 			if (pos != std::string::npos) {
@@ -186,12 +210,14 @@ void Configuration::checkListen(std::istringstream& iss, t_listen& listen) {
 				temp_str = address.substr(0, pos);
 				if (temp_str == "0.0.0.0")
 					listen.host = INADDR_ANY;
-				else {
+				else
+				{
 					listen.host = convertIP(temp_str);
 					!listen.host ? throw ConfigurationException("Couldn't convert host => " + temp_str) : 0;
 				}
 			}
-			else {
+			else
+			{
 				listen.host = INADDR_ANY;
 				eraseSemicolon(address);
 				!isNumeric(address) ? throw ConfigurationException("Port wrongly formatted => " + address) : 0;
@@ -203,17 +229,19 @@ void Configuration::checkListen(std::istringstream& iss, t_listen& listen) {
 	}
 }
 
-
 /**
  * @brief Parses the server root directive from the configuration body.
  *
  * @param body The body of the configuration to parse.
  * @param conf The server configuration structure to store the parsed server root.
  */
-void	Configuration::checkSvRoot(std::vector<std::string>& body, t_server_config& conf) {
+void	Configuration::checkSvRoot(std::vector<std::string>& body, t_server_config& conf)
+{
 	std::vector<std::string>::iterator it;
-	for (it = body.begin(); it != body.end(); it++) {
-		if (*it == "root") {
+	for (it = body.begin(); it != body.end(); it++)
+	{
+		if (*it == "root")
+		{
 			it++;
 			conf.server_root = *it;
 			if (conf.server_root[conf.server_root.length() - 1] != '/')
@@ -265,15 +293,19 @@ void	Configuration::checkErrPage(std::vector<std::string>& body, t_server_config
  * @param body The body of the configuration to parse.
  * @param conf The server configuration structure to store the parsed index files.
  */
-void	Configuration::checkIndex(std::vector<std::string>& body, t_server_config& conf) {
+void	Configuration::checkIndex(std::vector<std::string>& body, t_server_config& conf)
+{
 	std::vector<std::string>::iterator it;
-	for (it = body.begin(); it != body.end(); it++) {
+	for (it = body.begin(); it != body.end(); it++)
+	{
 		if (*it == "location")
 			break ;
-		else if (*it == "index") {
+		else if (*it == "index")
+		{
 			it++;
 			conf.index.clear();
-			while (*it != ";") {
+			while (*it != ";")
+			{
 				conf.index.push_back(*it);
 				it++;
 			}
@@ -288,14 +320,18 @@ void	Configuration::checkIndex(std::vector<std::string>& body, t_server_config& 
  * @param body The body of the configuration to parse.
  * @param conf The server configuration structure to store the parsed allowed methods.
  */
-void	Configuration::checkMethods(std::vector<std::string>& body, t_server_config& conf) {
+void	Configuration::checkMethods(std::vector<std::string>& body, t_server_config& conf)
+{
 	std::vector<std::string>::iterator it;
-	for (it = body.begin(); it != body.end(); it++) {
+	for (it = body.begin(); it != body.end(); it++)
+	{
 		if (*it == "location")
 			throw ConfigurationException("'location' before 'allow_methods' in config file");
-		else if (*it == "allow_methods") {
+		else if (*it == "allow_methods")
+		{
 			it++;
-			while (*it != ";") {
+			while (*it != ";")
+			{
 				if (*it != "GET" && *it != "POST" && *it != "DELETE")
 					throw ConfigurationException("undefined method in config file => " + *it);
 				conf.allow_methods.push_back(*it);
@@ -319,10 +355,12 @@ void	Configuration::checkMethods(std::vector<std::string>& body, t_server_config
 void	Configuration::checkClientBodySize(std::vector<std::string> &body, t_server_config &conf)
 {
 	std::vector<std::string>::iterator it;
-	for (it = body.begin(); it != body.end(); it++) {
+	for (it = body.begin(); it != body.end(); it++)
+	{
 		if (*it == "location")
 			throw ConfigurationException("'location' before 'client_max_body_size' in config file");
-		if (*it == "client_max_body_size") {
+		if (*it == "client_max_body_size")
+		{
 			it++;
 			if (it != body.end() && !isNumeric(*it))
 				throw ConfigurationException("invalid client_max_body_size => " + *it);
@@ -333,6 +371,41 @@ void	Configuration::checkClientBodySize(std::vector<std::string> &body, t_server
 			return;
 		}
 	}
+}
+
+void Configuration::processLocationDir(std::vector<std::string>::iterator& it, std::vector<std::string>& body, t_server_config& conf)
+{
+    LocationDir* newDir = new LocationDir;
+    newDir->name = *it;
+    if (!newDir->name.empty() && newDir->name[newDir->name.size() - 1] == '/')
+        newDir->name.erase(newDir->name.size() - 1);
+    conf.locationStruct.push_back(newDir);
+    it++;
+    int bracketCounter = 0;
+    while (it != body.end())
+    {
+        if (*it == "location" && (*(it + 1)).find("/") != std::string::npos)
+        {
+            it--;
+            break ;
+        }
+        else if (*it == "{" || *it == "}")
+            bracketCounter++;
+        else if (*it == "location" && ((*(it + 1)).find("*") != std::string::npos || (*(it + 1)).find(".") != std::string::npos))
+            if (*(it + 2) == "{" && (bracketCounter + 1) % 2 != 0)
+            {
+                it--;
+                break ;
+            }
+        if (*it != "}")
+        {
+            std::vector<std::string> values = extractValues(it, body, true);
+            setKeywords("dir", values, *(conf.locationStruct.back()));
+        }
+        it++;
+    }
+    if (it == body.end())
+        return;
 }
 
 /**
@@ -347,66 +420,45 @@ void	Configuration::checkClientBodySize(std::vector<std::string> &body, t_server
  * @param conf The server configuration structure to populate.
  * @throw ConfigurationException If there are errors in the configuration format or mandatory keywords are missing.
  */
-void	Configuration::checkLocations(Server* server, std::vector<std::string>& body, t_server_config& conf) {
-	std::vector<std::string>::iterator it;
-	int bracketCounter = 0;
-	if (checkKeywords(body) == -1)
-		throw ConfigurationException("Invalid alias or methods.");
-	for (it = body.begin(); it != body.end(); it++) {
-		if (*it == "location") {
-			it++;
-			if (it != body.end() && (*it).find("/") != std::string::npos) {
-				LocationDir* newDir = new LocationDir;
-				newDir->name = *it;
-				if (!newDir->name.empty() && newDir->name[newDir->name.size() - 1] == '/')
-                    newDir->name.erase(newDir->name.size() - 1);
-				conf.locationStruct.push_back(newDir);
-				it++;
-				while (it != body.end()) {
-					if (*it == "location" && (*(it + 1)).find("/") != std::string::npos) {
-						it--;
-						break ;
-					}
-					else if (*it == "{" || *it == "}")
-						bracketCounter++;
-					else if (*it == "location" && ((*(it + 1)).find("*") != std::string::npos || (*(it + 1)).find(".") != std::string::npos))
-						if (*(it + 2) == "{" && (bracketCounter + 1) % 2 != 0) {
-							it--;
-							break ;
-						}
-					if (*it != "}") {
-						std::vector<std::string> values = extractValues(it, body, true);
-						setKeywords("dir", values, *(conf.locationStruct.back()));
-					}
-					it++;
-				}
-				if (it == body.end())
-					break ;
-			}
-			else if ((*it).find("*") != std::string::npos || (*it).find(".") != std::string::npos) {
-				LocationFiles* newFile = new LocationFiles;
-				newFile->name = *it;
-				conf.locationStruct.push_back(newFile);
-				it++;
-				while (it != body.end() && *it != "location") {
-					if (*it != "}") {
-						std::vector<std::string> values = extractValues(it, body, true);
-						setKeywords("file", values, *(conf.locationStruct.back()));
-					}
-					it++;
-				}
-				if (it == body.end()) {
-					if (newFile->cgi_pass.empty() || !newFile->allow_methods.size()) {
-						conf.locationStruct.pop_back();
-						delete newFile;
-					}
-					break ;
-				}
-				it--;
-			}
-		}
-	}
-	logger(server, conf);
+void Configuration::checkLocations(Server* server, std::vector<std::string>& body, t_server_config& conf)
+{
+    std::vector<std::string>::iterator it;
+    if (checkKeywords(body) == -1)
+        throw ConfigurationException("Invalid aliasor methods.");
+    for (it = body.begin(); it != body.end(); it++) {
+        if (*it == "location") {
+            it++;
+            if (it != body.end() && (*it).find("/") != std::string::npos)
+                processLocationDir(it, body, conf);
+            else if ((*it).find("*") != std::string::npos || (*it).find(".") != std::string::npos)
+            {
+                LocationFiles* newFile = new LocationFiles;
+                newFile->name = *it;
+                conf.locationStruct.push_back(newFile);
+                it++;
+                while (it != body.end() && *it != "location")
+                {
+                    if (*it != "}")
+                    {
+                        std::vector<std::string> values = extractValues(it, body, true);
+                        setKeywords("file", values, *(conf.locationStruct.back()));
+                    }
+                    it++;
+                }
+                if (it == body.end())
+                {
+                    if (newFile->cgi_pass.empty() || !newFile->allow_methods.size())
+                    {
+                        conf.locationStruct.pop_back();
+                        delete newFile;
+                    }
+                    break ;
+                }
+                it--;
+            }
+        }
+    }
+    logger(server, conf);
 }
 
 /**
@@ -419,16 +471,20 @@ void	Configuration::checkLocations(Server* server, std::vector<std::string>& bod
  * @param body The vector containing configuration data.
  * @return 0 if all mandatory keywords are present and correctly formatted, -1 otherwise.
  */
-int	Configuration::checkKeywords(std::vector<std::string>& body) {
+int	Configuration::checkKeywords(std::vector<std::string>& body)
+{
 	std::vector<std::string>::iterator it;
-	for (it = body.begin(); it != body.end(); it++) {
+	for (it = body.begin(); it != body.end(); it++)
+	{
 		if (*it == "alias" && *(it + 1) == ";")
 			return (-1);
-		else if (*it == "allow_methods") {
+		else if (*it == "allow_methods")
+		{
 			it++;
 			if (*it == ";")
 				return (-1);
-			while (*it != ";") {
+			while (*it != ";")
+			{
 				if (*it != "GET" && *it != "POST" && *it != "DELETE")
 					return (-1);
 				it++;
@@ -438,6 +494,124 @@ int	Configuration::checkKeywords(std::vector<std::string>& body) {
 			return (-1);
 	}
 	return (0);
+}
+
+
+int Configuration::setKeywordsDir(std::vector<std::string> values, BaseLocation& strc)
+{
+    std::istringstream iss(createLocalKeyMap()["dir"]);
+    std::string word;
+    std::string LocationDir::*data[3] = { &LocationDir::alias, &LocationDir::redirect, &LocationDir::root};
+    std::string key[3] = {"alias", "redirect", "root"};
+    std::vector<std::string>::iterator values_it = values.begin() + 1;
+    if (values.empty())
+        return (0);
+    LocationDir* dir = dynamic_cast<LocationDir*>(&strc);
+    if (dir)
+	{
+        	while (iss >> word)
+			{
+				for (int i = 0; i < 3; i++)
+				{
+					if (values[0] == key[i])
+					{
+						dir->*data[i] = values[1];
+						if (!static_cast<std::string>(dir->root).empty() && !static_cast<std::string>(dir->redirect).empty())
+							throw (ConfigurationException("conflituous 'root' and 'redirect' directives in location block"));
+						return (0);
+					}
+				}
+				if (values[0] == word && word == "index")
+				{
+					while (values_it != values.end())
+					{
+						dir->index.push_back(*values_it);
+						values_it++;
+					}
+				}
+				else if (values[0] == word && word == "allow_methods")
+				{
+					while (values_it != values.end())
+					{
+						dir->allow_methods.push_back(*values_it);
+						values_it++;
+					}
+				}
+				else if (values[0] == word && word == "autoindex")
+				{
+					if (values.size() == 1)
+						dir->autoindex = true;
+					else throw ConfigurationException("Autoindex takes no values.");
+				}
+				else if (values[0] == "location" && ((values[1].find("*") != std::string::npos) || values[1].find(".") != std::string::npos))
+				{
+					while (iss >> word && *values_it != "}" && values_it != values.end())
+					{
+						LocationFiles* newFile = new LocationFiles;
+						newFile->name = values[1];
+						values_it++;
+						dir->files.push_back(newFile);
+						if (*values_it != "}")
+						{
+							std::vector<std::string> extract = extractValues(values_it, values, false);
+							if (setKeywords("file", extract, *dir->files.back()) == -1)
+								dir->files.pop_back();
+							return (0);
+						}
+					}
+				}
+			}
+		}
+    return (0);
+    }
+
+int Configuration::setKeywordsFile(std::vector<std::string> values, BaseLocation& strc)
+{
+    std::istringstream iss(createLocalKeyMap()["file"]);
+    std::string word;
+    std::vector<std::string>::iterator values_it = values.begin() + 1;
+    if (values.empty())
+        return (0);
+    LocationFiles *file = dynamic_cast<LocationFiles*>(&strc);
+    if (file) {
+       while (iss >> word)
+			{
+				if (values[0] == word && word == "cgi_pass")
+				{
+					file->cgi_pass = values[1];
+					values_it++;
+					if (values_it != values.end())
+					{
+						values_it++;
+						if (*values_it == "allow_methods")
+						{
+							while (values_it != values.end() && *values_it != ";")
+							{
+								file->allow_methods.push_back(*values_it);
+								values_it++;
+							}
+						}
+					}
+				}
+				else if (values[0] == word && word == "allow_methods")
+				{
+					while (values_it != values.end() && *values_it != ";")
+					{
+						file->allow_methods.push_back(*values_it);
+						values_it++;
+					}
+					while (values_it != values.end())
+					{
+						if (*values_it == "cgi_pass")
+							file->cgi_pass = *(values_it + 1);
+						values_it++;
+					}
+				}
+			}
+			if (file->cgi_pass.empty() || !file->allow_methods.size())
+				return (-1);
+		}
+    return (0);
 }
 
 /**
@@ -452,103 +626,13 @@ int	Configuration::checkKeywords(std::vector<std::string>& body) {
  * @param strc The location structure to populate.
  * @return 0 if keyword values are successfully set, -1 otherwise.
  */
-int	Configuration::setKeywords(std::string type, std::vector<std::string> values, BaseLocation& strc) {
-	std::istringstream iss(createLocalKeyMap()[type]);
-	std::string word;
-	std::string LocationDir::*data[3] = {
-		&LocationDir::alias,
-		&LocationDir::redirect,
-		&LocationDir::root
-	};
-	std::string key[3] = {
-		"alias",
-		"redirect",
-		"root"
-	};
-	std::vector<std::string>::iterator values_it = values.begin() + 1;
-	if (values.empty())
-		return (0);
-	if (type == "dir") {
-		LocationDir* dir = dynamic_cast<LocationDir*>(&strc);
-		if (dir) {
-			while (iss >> word) {
-				for (int i = 0; i < 3; i++) {
-					if (values[0] == key[i]) {
-						dir->*data[i] = values[1];
-						if (!static_cast<std::string>(dir->root).empty() && !static_cast<std::string>(dir->redirect).empty())
-							throw (ConfigurationException("conflituous 'root' and 'redirect' directives in location block"));
-						return (0);
-					}
-				}
-				if (values[0] == word && word == "index") {
-					while (values_it != values.end()) {
-						dir->index.push_back(*values_it);
-						values_it++;
-					}
-				}
-				else if (values[0] == word && word == "allow_methods") {
-					while (values_it != values.end()) {
-						dir->allow_methods.push_back(*values_it);
-						values_it++;
-					}
-				}
-				else if (values[0] == word && word == "autoindex") {
-					if (values.size() == 1)
-						dir->autoindex = true;
-					else throw ConfigurationException("Autoindex takes no values.");
-				}
-				else if (values[0] == "location" && ((values[1].find("*") != std::string::npos) || values[1].find(".") != std::string::npos)) {
-					while (iss >> word && *values_it != "}" && values_it != values.end()) {
-						LocationFiles* newFile = new LocationFiles;
-						newFile->name = values[1];
-						values_it++;
-						dir->files.push_back(newFile);
-						if (*values_it != "}") {
-							std::vector<std::string> extract = extractValues(values_it, values, false);
-							if (setKeywords("file", extract, *dir->files.back()) == -1)
-								dir->files.pop_back();
-							return (0);
-						}
-					}
-				}
-			}
-		}
-	}
-	else if (type == "file") {
-		LocationFiles *file = dynamic_cast<LocationFiles*>(&strc);
-		if (file) {
-			while (iss >> word) {
-				if (values[0] == word && word == "cgi_pass") {
-					file->cgi_pass = values[1];
-					values_it++;
-					if (values_it != values.end()) {
-						values_it++;
-						if (*values_it == "allow_methods") {
-							while (values_it != values.end() && *values_it != ";") {
-								file->allow_methods.push_back(*values_it);
-								values_it++;
-							}
-						}
-					}
-				}
-				else if (values[0] == word && word == "allow_methods") {
-					while (values_it != values.end() && *values_it != ";") {
-						file->allow_methods.push_back(*values_it);
-						values_it++;
-					}
-					while (values_it != values.end()) {
-						if (*values_it == "cgi_pass") {
-							file->cgi_pass = *(values_it + 1);
-						}
-						values_it++;
-					}
-				}
-			}
-			if (file->cgi_pass.empty() || !file->allow_methods.size())
-				return (-1);
-		}
-	}
-	return (0);
+int Configuration::setKeywords(std::string type, std::vector<std::string> values, BaseLocation& strc)
+{
+    if (type == "dir")
+        return setKeywordsDir(values, strc);
+	else if (type == "file")
+        return setKeywordsFile(values, strc);
+    return (0);
 }
 
 /* ===================== General Checking Functions ===================== */
@@ -575,8 +659,10 @@ void	Configuration::checkDoubles(std::vector<std::string>& body)
 	keywords.insert("server_name");
 	keywords.insert("cgi_pass");
 	keywords.insert("autoindex");
-	for (std::vector<std::string>::iterator it = body.begin(); it != body.end(); it++) {
-		if ((*it) == "location" && it + 1 != body.end()) {
+	for (std::vector<std::string>::iterator it = body.begin(); it != body.end(); it++)
+	{
+		if ((*it) == "location" && it + 1 != body.end())
+		{
 			std::vector<std::string> newBody(it + 1, body.end());
 			checkDoubles(newBody);
 			break ;
@@ -597,23 +683,28 @@ void	Configuration::checkDoubles(std::vector<std::string>& body)
  * @param server Pointer to the Server instance.
  * @param conf The server configuration structure containing the parsed locations.
  */
-void	Configuration::logger(Server* server, t_server_config& conf) {
+void	Configuration::logger(Server* server, t_server_config& conf)
+{
 	std::string	logPath = "./logs/locales";
 	std::string	logFile = "./logs/locales/localgen.txt";
-	if (createDirectory(logPath.c_str())) {
+	if (createDirectory(logPath.c_str()))
+	{
 		std::fstream outfile(logFile.c_str(), std::ios_base::app);
 		std::time_t timestamp = std::time(NULL);
 		char buff[50];
 		std::strftime(buff, sizeof(buff), "%Y-%m-%d %H:%M:%S", std::localtime(&timestamp));
-		if (!outfile.fail()) {
+		if (!outfile.fail())
+		{
 			outfile << std::endl;
 			outfile << "================================================" << std::endl;
 			outfile << "#### SERVER PORT " << server->getListen().port << " " << buff << " ####" << std::endl << std::endl;
 			outfile << *server << std::endl;
 			outfile << "  ### LOCATIONS ###" << std::endl;
-			for (size_t i = 0; i < conf.locationStruct.size(); i++) {
+			for (size_t i = 0; i < conf.locationStruct.size(); i++)
+			{
 				LocationDir* dir = dynamic_cast<LocationDir*>(conf.locationStruct[i]);
-				if (dir) {
+				if (dir)
+				{
 					outfile << "Is File: False" << std::endl;
 					outfile << "	name: " << dir->name << std::endl;
 					outfile << "	redirect: " << dir->redirect << std::endl;
@@ -629,7 +720,8 @@ void	Configuration::logger(Server* server, t_server_config& conf) {
 					for (it = dir->allow_methods.begin(); it != dir->allow_methods.end(); it++)
 						outfile << *it << " ";
 					outfile << std::endl;
-					for (size_t j = 0; j < dir->files.size(); j++) {
+					for (size_t j = 0; j < dir->files.size(); j++)
+					{
 						outfile << "	Script:" << std::endl;
 						outfile << "		name: " << dir->files[j]->name << std::endl;
 						outfile << "		cgi_pass: " << dir->files[j]->cgi_pass << std::endl;
@@ -640,9 +732,11 @@ void	Configuration::logger(Server* server, t_server_config& conf) {
 					}
 					outfile << std::endl;
 				}
-				else {
+				else
+				{
 					LocationFiles* files = dynamic_cast<LocationFiles*>(conf.locationStruct[i]);
-					if (files) {
+					if (files)
+					{
 						std::vector<std::string>::iterator it;
 						outfile << "Is File: True" << std::endl;
 						outfile << "	name: " << files->name << std::endl;
@@ -664,17 +758,21 @@ void	Configuration::logger(Server* server, t_server_config& conf) {
 /* ===================== Exceptions ===================== */
 
 
-Configuration::ConfigurationException::ConfigurationException(const std::string& error) {
-	if (!error.empty()) {
+Configuration::ConfigurationException::ConfigurationException(const std::string& error)
+{
+	if (!error.empty())
+	{
 		std::ostringstream err;
 		err << BOLD << RED << "Error: " << error << RESET;
 		_errMessage = err.str();
 	}
 }
 
-Configuration::ConfigurationException::~ConfigurationException() throw() {}
+Configuration::ConfigurationException::~ConfigurationException() throw()
+{
+}
 
-
-const char *Configuration::ConfigurationException::what() const throw() {
+const char *Configuration::ConfigurationException::what() const throw()
+{
 	return (_errMessage.c_str());
 }

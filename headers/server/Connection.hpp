@@ -10,7 +10,8 @@
 class Request;
 class Response;
 
-class Connection {
+class Connection
+{
 
     private:
         Connection();
@@ -23,7 +24,6 @@ class Connection {
         Connection& operator=(const Connection& original);
         explicit Connection(int fd);
         ~Connection();
-
         int         getConnectionFD() const;
         Request&    getConnectionRequest();
         Response&   getConnectionResponse();

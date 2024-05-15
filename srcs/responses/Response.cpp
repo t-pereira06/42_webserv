@@ -16,11 +16,13 @@
 
 Response::Response() : _isAlias(false), _isRedirect(false) {}
 
-Response::Response(const Response& original) {
+Response::Response(const Response& original) 
+{
 	_httpResponse = original._httpResponse;
 }
 
-Response& Response::operator=(const Response& original) {
+Response& Response::operator=(const Response& original) 
+{
 	if (this != &original)
 		_httpResponse = original._httpResponse;
 	return (*this);
@@ -30,38 +32,46 @@ Response::~Response() {}
 
 /* ===================== Setter Functions ===================== */
 
-void	Response::setHTTPResponse(std::string str) {
+void	Response::setHTTPResponse(std::string str) 
+{
 	_httpResponse = str;
 }
 
-void	Response::defaultFlags() {
+void	Response::defaultFlags() 
+{
 	_isAlias = false;
 	_isRedirect = false;
 }
 
 /* ===================== Getter Functions ===================== */
 
-bool	Response::getRedirectFlag() {
+bool	Response::getRedirectFlag() 
+{
 	return (_isRedirect);
 }
 
-std::string	Response::getHTTPResponse() const {
+std::string	Response::getHTTPResponse() const 
+{
 	return (_httpResponse);
 }
 
-size_t	Response::getIndexSize() const {
+size_t	Response::getIndexSize() const 
+{
 	return (_indexSize);
 }
 
-std::vector<std::string> Response::getIndexVector() const {
+std::vector<std::string> Response::getIndexVector() const 
+{
 	return (_indexVector);
 }
 
-std::string	Response::getRootPath() const {
+std::string	Response::getRootPath() const
+ {
 	return (_rootPath);
 }
 
-std::string Response::itosResponseCode(int code) {
+std::string Response::itosResponseCode(int code) 
+{
 	std::string msg = responseCode(code);
 	return msg;
 }
@@ -79,31 +89,36 @@ std::string Response::itosResponseCode(int code) {
  * @param serverConf The server configuration containing error pages mapping.
  * @return The path to the error page file.
  */
-const std::string Response::getErrorPage(int errorCode, const t_server_config &serverConf) {
+const std::string Response::getErrorPage(int errorCode, const t_server_config &serverConf) 
+{
 	std::map<int, std::string>::const_iterator it = serverConf.errorPages.find(errorCode);
-	if (it != serverConf.errorPages.end()) {
+	if (it != serverConf.errorPages.end()) 
+	{
 		std::string errorPageDir(it->second);
 		size_t pos = errorPageDir.find("0x.html");
 		size_t pos2 = errorPageDir.find("xx.html");
 		std::string errorCodeStr = intToStr(errorCode);
-		if (pos2 != std::string::npos) {
+		if (pos2 != std::string::npos) 
+		{
 			errorCodeStr.erase(0, 1);
 			errorPageDir.replace(pos2, 2, errorCodeStr);
 		}
-		else if (pos != std::string::npos) {
+		else if (pos != std::string::npos)
 			errorPageDir.replace(pos - 1, 3, errorCodeStr);
-		}
 		std::string errorPage = serverConf.server_root + "errors" + errorPageDir;
 		std::ifstream errorFile(errorPage.c_str());
 		if (errorFile.is_open())
 			return errorPage;
-		else {
+		else 
+		{
 			std::cout << "Error: The error page (" << errorPage  << ") wasn't present in the server files.\nUsing DefaultErrorPage instead." << std::endl;
 			return (serverConf.server_root + "errors" + "/DefaultErrorPage.html");
 		}
 	}
-	else {
-		std::cout << "Error: The error code (" << errorCode << ") wasn't present in the config file.\nUsing DefaultErrorPage instead." << std::endl;
+	else 
+	{
+		if (errorCode != 200)
+			std::cout << "Error: The error code (" << errorCode << ") wasn't present in the config file.\nUsing DefaultErrorPage instead." << std::endl;
 		return (serverConf.server_root + "errors" + "/DefaultErrorPage.html");
 	}
 }
@@ -120,7 +135,8 @@ const std::string Response::getErrorPage(int errorCode, const t_server_config &s
  * @param uri The requested URI.
  * @return The root directory associated with the requested URI.
  */
-const std::string Response::findRoot(Server* server, const std::string& uri) {
+const std::string Response::findRoot(Server* server, const std::string& uri) 
+{
 	std::vector<BaseLocation*>::const_iterator it;
 
 	// Set default as 404
@@ -131,24 +147,29 @@ const std::string Response::findRoot(Server* server, const std::string& uri) {
 		result = "/";
 
 	// Check if uri is present in any other location, even / , because locations have precedence
-	for (it = server->getConf().locationStruct.begin(); it != server->getConf().locationStruct.end(); ++it) {
+	for (it = server->getConf().locationStruct.begin(); it != server->getConf().locationStruct.end(); ++it) 
+	{
 		LocationDir* dir = dynamic_cast<LocationDir*>(*it);
-		if (dir && dir->name == uri) {
+		if (dir && dir->name == uri) 
+		{
 
 			// Check if alias is defined in config file and we've not setted result with the alias previously
-			if (!dir->alias.empty() && !_isAlias) {
+			if (!dir->alias.empty() && !_isAlias) 
+			{
 				result = dir->alias;
 				_isAlias = true;
 				break ;
 			}
 
 			// If alias is empty or we checked it previously, now we search if root is defined. If it is, disable alias
-			if (!dir->root.empty()) {
+			if (!dir->root.empty()) 
+			{
 				result = dir->root;
 				_isAlias = false;
 				break ;
 			} // If root is empty then we check redirect
-			else if (!dir->redirect.empty()) {
+			else if (!dir->redirect.empty()) 
+			{
 				result = dir->redirect;
 				_isRedirect = true;
 
@@ -164,11 +185,13 @@ const std::string Response::findRoot(Server* server, const std::string& uri) {
 	}
 
 	// After receiving the correct path, we manipulate it to have the correct syntax to add to our path
-	if (result.find(".") == 0) {
+	if (result.find(".") == 0) 
+	{
 		result.erase(0, 1);
 		if (result.find("/") == 0)
 			result.erase(0, 1);
-	} else if (result.find("/") == 0)
+	} 
+	else if (result.find("/") == 0)
 		result.erase(0, 1);
 	return result;
 }
@@ -184,10 +207,12 @@ const std::string Response::findRoot(Server* server, const std::string& uri) {
  * @param name The name of the LocationDir object to retrieve.
  * @return Pointer to the LocationDir object if found; otherwise, NULL.
  */
-LocationDir*	Response::getDir(Server *server, const std::string& name) {
+LocationDir*	Response::getDir(Server *server, const std::string& name) 
+{
 	std::vector<BaseLocation*>::const_iterator it;
 	std::string result;
-	for (it = server->getConf().locationStruct.begin(); it != server->getConf().locationStruct.end(); ++it) {
+	for (it = server->getConf().locationStruct.begin(); it != server->getConf().locationStruct.end(); ++it) 
+	{
 		LocationDir* dir = dynamic_cast<LocationDir*>(*it);
 		if (dir && dir->name == name)
 			return dir;
@@ -221,7 +246,8 @@ std::string	Response::selectIndexFile(Server* server, int fd, const std::vector<
 
 	// Check if directory listing is off and we're trying to access via directory
 	LocationDir* dir = getDir(server, uri);
-	if(dir) {
+	if(dir) 
+	{
 		if (!autoindex && possibleIndex.empty() && dir->index.size() == 0)
 			return ("404");
 
@@ -230,43 +256,50 @@ std::string	Response::selectIndexFile(Server* server, int fd, const std::vector<
 			return ("LIST");
 	}
 	// In case we're trying to access the file directly, check if it exists, or is accessible
-	if (!possibleIndex.empty()) {
+	if (!possibleIndex.empty()) 
+	{
 
 		// If Alias is defined, searches there first
 		std::ifstream htmlFile((root + possibleIndex).c_str());
-		if (htmlFile.is_open()) {
+		if (htmlFile.is_open()) 
+		{
 			server->getDynamicConfig().indexFile = possibleIndex;
 			htmlFile.close();
 			return (root);
 		}
 		// if not found in alias, try root
-		else if (_isAlias) {
+		else if (_isAlias) 
+		{
 			locationRoot = findRoot(server, uri);
 			if (locationRoot == "404" || locationRoot == "400")
 				return (locationRoot);
 			else if (_isRedirect)
 				return ("REDIRECT"); // Useless return, but it's ok
-
 			// Recursively search for the index file, now in root
 			newroot = selectIndexFile(server, fd, indexVector, size, (server->getConf().server_root + locationRoot), uri, autoindex, possibleIndex);
 				return (newroot);
 		}
 
 	// Try to access via directory when listing is ON
-	} else {
+	} 
+	else 
+	{
 
 		// Search for the first OK index file provided
-		for (size_t i = 0; i < size; i++) {
+		for (size_t i = 0; i < size; i++) 
+		{
 			std::string filename = indexVector[i];
 			std::ifstream htmlFile((root + filename).c_str());
-			if (htmlFile.is_open()) {
+			if (htmlFile.is_open()) 
+			{
 				server->getDynamicConfig().indexFile = filename;
 				htmlFile.close();
 				return (root);
 			}
 
 			// If we didn't find the index in the alias path, then check the subdirectory's root path
-			if (i + 1 >= size && _isAlias) {
+			if (i + 1 >= size && _isAlias) 
+			{
 				// This will fetch the root path since we already have tried alias once
 				locationRoot = findRoot(server, uri);
 				// We add these checks here because root may also return an error if the file isn't present or we're dealing with a redirect
@@ -283,7 +316,6 @@ std::string	Response::selectIndexFile(Server* server, int fd, const std::vector<
 	// Final check if no root is found
 	if (newroot.empty())
 		return ("404");
-
 	// Will only reach this return if we're recursively search root after alias
 	return (newroot);
 }
@@ -302,7 +334,8 @@ std::string	Response::selectIndexFile(Server* server, int fd, const std::vector<
  * @param location Path of the directory to generate the listing for.
  * @return The number of files listed in the directory.
  */
-int	Response::generateDirListing(Server* server, int fd, std::string location) {
+int	Response::generateDirListing(Server* server, int fd, std::string location) 
+{
 	std::string		filename(".directorylist.html");
 	std::string		path("var/www/html/" + filename);
 	std::ofstream	tmp(path.c_str());
@@ -316,10 +349,8 @@ int	Response::generateDirListing(Server* server, int fd, std::string location) {
 	sendResponse(server, fd, path, 200);
 
 	// Remove the temp file
-	if (std::remove(path.c_str()) != 0) {
-        // Handle error if unable to delete file
+	if (std::remove(path.c_str()) != 0) 
         std::cerr << "Error: Unable to delete file " << path << std::endl;
-    }
 	return (nFiles);
 }
 
@@ -337,20 +368,24 @@ int	Response::generateDirListing(Server* server, int fd, std::string location) {
  * @param file Path of the file containing the response content.
  * @param code HTTP status code.
  */
-void	Response::sendResponse(Server* server, int fd, std::string file, int code) {
+void	Response::sendResponse(Server* server, int fd, std::string file, int code) 
+{
 	std::string response;
 	(void)server;
 	// If we're redirecting call _httpResponse from class, send the response and close it. It may be an exterior domain and we have no need to "control" those
-	if (_isRedirect && code == 200) {
+	if (_isRedirect && code == 200) 
+	{
 		response = _httpResponse;
 		send(fd, response.c_str(), response.size(), 0);
 		close(fd);
 	}
-	else {
+	else 
+	{
 
 		// Check if we can open the file, we already did this in selectIndexFile, but it's a good practice
 		std::ifstream htmlFile((file).c_str());
-		if (htmlFile.is_open()) {
+		if (htmlFile.is_open()) 
+		{
 			// Read the html file and add it to our response headers with the received code and it's appropriate message
 			std::stringstream ss;
 			ss << htmlFile.rdbuf();
@@ -367,7 +402,8 @@ void	Response::sendResponse(Server* server, int fd, std::string file, int code) 
 			// Send the response
 			send(fd, response.c_str(), response.size(), 0);
 		}
-		else {
+		else 
+		{
 			throw ResponseException("HTML file doesn't exist or is inaccessible.");
 		}
 	}
@@ -384,7 +420,8 @@ void	Response::sendResponse(Server* server, int fd, std::string file, int code) 
  * @param write_fd File descriptor for writing to the CGI script.
  * @param clientSocket File descriptor of the client socket.
  */
-void	Response::sendResponseCGI(int read_fd, int write_fd, int clientSocket) {
+void	Response::sendResponseCGI(int read_fd, int write_fd, int clientSocket) 
+{
 	// Define a buffer for reading
     const size_t bufferSize = 1024;
     char buffer[bufferSize];
@@ -394,7 +431,8 @@ void	Response::sendResponseCGI(int read_fd, int write_fd, int clientSocket) {
 
     // Read the contents of the file descriptor into the buffer
     ssize_t bytesRead;
-    while ((bytesRead = read(read_fd, buffer, bufferSize)) > 0) {
+    while ((bytesRead = read(read_fd, buffer, bufferSize)) > 0) 
+	{
         // Append the data read to the std::string object
         content.append(buffer, bytesRead);
 		close(write_fd);
@@ -417,19 +455,23 @@ void	Response::sendResponseCGI(int read_fd, int write_fd, int clientSocket) {
  * 
  * @param url The URL to redirect to.
  */
-void	Response::redirURL(const std::string& url){
+void	Response::redirURL(const std::string& url)
+{
 	std::string rdc;
 	std::string url_tmp(url);
 	// Checking if we're setting the redirect URL correctly
 
 	// If we find localhost at the beginning of the redirect, then we say the redirect will be either root '/' or a location '/....'
-	if (url_tmp.find("localhost") == 0) {
+	if (url_tmp.find("localhost") == 0) 
+	{
 		if (url_tmp.find("/") != url_tmp.length() - 1)
 			url_tmp.append("/");
 		rdc = url_tmp.substr(url_tmp.find("/"), std::string::npos);
-	} else if (url_tmp.find("http") == 0)	// If we are doing a redirect to another domain or website, then the url needs to be preceded by http or https
+	} 
+	else if (url_tmp.find("http") == 0)	// If we are doing a redirect to another domain or website, then the url needs to be preceded by http or https
 		rdc = url_tmp;
-	else {
+	else 
+	{
 		_httpResponse = "400";	// If the previous rules aren't followed we update the response to generate a 400 Bad Request Error
 		return ;
 	};
@@ -652,7 +694,8 @@ std::string responseCode(int code)
 
 /* ===================== Exceptions ===================== */
 
-Response::ResponseException::ResponseException(const std::string& error) {
+Response::ResponseException::ResponseException(const std::string& error) 
+{
 	std::ostringstream err;
 	err << BOLD << RED << "Error: " << error << RESET;
 	_errMessage = err.str();
@@ -665,6 +708,7 @@ Response::ResponseException::~ResponseException() throw() {}
  *
  * @return The error message as a C-style string.
  */
-const char *Response::ResponseException::what() const throw() {
+const char *Response::ResponseException::what() const throw() 
+{
 	return (_errMessage.c_str());
 }

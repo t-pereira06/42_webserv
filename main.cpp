@@ -27,9 +27,11 @@ bool chunky = false;
  *
  * @param signum The signal number.
  */
-extern "C" void	signalHandler(int signum) {
+extern "C" void	signalHandler(int signum) 
+{
 
-    if (gServerCluster) {
+    if (gServerCluster) 
+    {
         std::vector<Server*>::const_iterator it;
         for (it = gServerCluster->getServers().begin(); it != gServerCluster->getServers().end(); ++it)
             close((*it)->getFD());
@@ -43,7 +45,8 @@ extern "C" void	signalHandler(int signum) {
     std::cout << "Closing program safely ";
     std::cout.flush();
 
-    for (int j = 0; j < 10; ++j) {
+    for (int j = 0; j < 10; ++j)
+    {
         std::cout << "\r" << BOLD << YELLOW << "Closing program safely... " << loadingIcons[j % numIcons] << RESET;
         std::cout.flush();
         usleep(100000); // Sleep for 100 milliseconds (adjust as needed)
@@ -53,7 +56,8 @@ extern "C" void	signalHandler(int signum) {
     std::cout << std::endl;
 }
 
-void printWebServLogo() {
+void printWebServLogo() 
+{
 
     std::cout << BOLD << CYAN << " /██      /██ /████████ /███████   /██████  /████████ /███████  /██    /██\n";
     std::cout << "| ██  /█ | ██| ██_____/| ██__  ██ /██__  ██| ██_____/| ██__  ██| ██   | ██\n";

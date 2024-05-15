@@ -24,8 +24,10 @@
  * This class serves as the base class for location-related configurations.
  * It defines a virtual destructor to allow polymorphic behavior.
  */
-struct BaseLocation {
-	virtual ~BaseLocation() {}
+struct BaseLocation
+{
+	virtual ~BaseLocation()
+	{}
 };
 
 /**
@@ -35,14 +37,17 @@ struct BaseLocation {
  * It inherits from BaseLocation and includes attributes such as the file name,
  * CGI pass information, and allowed HTTP methods.
  */
-struct LocationFiles : BaseLocation {
+struct LocationFiles : BaseLocation
+{
 	std::string					name;
 	std::string					cgi_pass;
 	std::vector<std::string>				allow_methods;
-		LocationFiles() {}
-		virtual ~LocationFiles() {
-			allow_methods.clear();
-		}
+	LocationFiles()
+	{}
+	virtual ~LocationFiles()
+	{
+		allow_methods.clear();
+	}
 };
 
 /**
@@ -53,7 +58,8 @@ struct LocationFiles : BaseLocation {
  * alias, redirection, root directory, allowed HTTP methods, index files, and a list
  * of nested files configurations.
  */
-struct LocationDir : BaseLocation {
+struct LocationDir : BaseLocation
+{
 	std::string					name;
 	std::string					alias;
 	std::string					redirect;
@@ -62,8 +68,10 @@ struct LocationDir : BaseLocation {
 	std::vector<std::string>				allow_methods;
 	std::vector<std::string>				index;
 	std::vector<LocationFiles*>	files;
-		LocationDir() : autoindex(false) {}
-		virtual ~LocationDir() {
+		LocationDir() : autoindex(false)
+		{}
+		virtual ~LocationDir()
+		{
 			allow_methods.clear();
 			index.clear();
 			for (size_t i = 0; i < files.size(); i++)
@@ -79,7 +87,8 @@ struct LocationDir : BaseLocation {
  * This struct represents configuration for a listen directive in the server block.
  * It includes attributes such as the host and port to listen on.
  */
-typedef struct s_listen {
+typedef struct s_listen
+{
 	unsigned int	host;
 	int				port;
 } t_listen;
@@ -92,7 +101,8 @@ typedef struct s_listen {
  * location configurations, redirection, autoindex setting, and maximum client
  * body size. It also includes the number of location structures configured.
  */
-typedef struct s_server_conf {
+typedef struct s_server_conf
+{
 	std::vector<std::string>					server_name;
 	std::string						server_root;
 	std::vector<std::string>					index;
@@ -101,8 +111,10 @@ typedef struct s_server_conf {
 	std::map<int, std::string>		errorPages;
 	unsigned int					client_max_body_size;
 	std::vector<BaseLocation*>	locationStruct;
-		s_server_conf() : client_max_body_size(128) {}
-		~s_server_conf() {
+		s_server_conf() : client_max_body_size(128)
+		{}
+		~s_server_conf()
+		{
 			server_name.clear();
 			index.clear();
 			allow_methods.clear();
@@ -113,7 +125,8 @@ typedef struct s_server_conf {
 } t_server_config;
 
 
-typedef struct s_cgi_env {
+typedef struct s_cgi_env
+{
 	std::string auth_mode;
 	std::string	content_length;
 	std::string	content_type;

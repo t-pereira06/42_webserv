@@ -23,17 +23,17 @@
 class Server;
 class Configuration;
 
-class	Cluster {
-
+class	Cluster
+{
 	private:
 		Cluster();
-		size_t	_numberOfSv;
-		std::vector<Server*> _servers;
-		std::vector<pollfd> _pollFDs;
-		std::map<int, Server*> _fdToServerMap;
-		std::map<int, time_t> _activityTime;
-		std::vector<int>	_serverSockets;
-		Configuration	_config;
+		size_t					_numberOfSv;
+		std::vector<Server*>	 _servers;
+		std::vector<pollfd> 	_pollFDs;
+		std::map<int, Server*> 	_fdToServerMap;
+		std::map<int, time_t> 	_activityTime;
+		std::vector<int>		_serverSockets;
+		Configuration			_config;
 
 	public:
 		explicit Cluster(const std::string& filepath);
@@ -44,7 +44,6 @@ class	Cluster {
 		Server* getServer();
 		Server* getServer(int fd);
 		std::vector<Server*>& getServers();
-
 		void	initServer();
 		void	configureServer(Server* server);
 		void	createServer(t_listen& listenStruct);
@@ -57,7 +56,7 @@ class	Cluster {
 		void	callerServerName(Server* server);
 		void	callerListen(std::string& wordStack, t_listen& listen);
 		void	callerServerRoot(Server* server);
-		void	callerErrorPage(Server* server);//percorrer com o iterador
+		void	callerErrorPage(Server* server);
 		void	callerIndex(Server* server);
 		void	callerMethods(Server* server);
 		void	callerClientSize(Server* server);
@@ -65,7 +64,8 @@ class	Cluster {
 		void	startServers();
 		void	connectionHandler(int fd, Server* server);
 
-		class ClusterException : public std::exception {
+		class ClusterException : public std::exception
+		{
 			private:
 				std::string _errMessage;
 			public:

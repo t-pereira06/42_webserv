@@ -23,14 +23,17 @@
  * @param original The original stack to be inverted.
  */
 template <typename T>
-void	invertStack(std::stack<T>& original) {
+void	invertStack(std::stack<T>& original) 
+{
 	std::stack<T> tempStack;
 
-	while (!original.empty()) {
+	while (!original.empty()) 
+	{
 		tempStack.push(original.top());
 		original.pop();
 	}
-	while (!tempStack.empty()) {
+	while (!tempStack.empty()) 
+	{
 		original.push(tempStack.top());
 		tempStack.pop();
 	}
@@ -43,14 +46,17 @@ void	invertStack(std::stack<T>& original) {
  * @param original The vector to be inverted.
  */
 template <typename T>
-void	invertVector(std::vector<T>& original) {
+void	invertVector(std::vector<T>& original) 
+{
 	typename std::vector<T>::size_type left = 0;
 	typename std::vector<T>::size_type right = original.size() - 1;
-	if (original.empty()) {
+	if (original.empty()) 
+	{
 		std::cout << "No servers active - Awaiting termination..." << std::endl;
 		return ;
 	}
-	while (left < right) {
+	while (left < right) 
+	{
 		T temp = original[left];
 		original[left] = original[right];
 		original[right] = temp;
