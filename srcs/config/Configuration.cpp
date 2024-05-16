@@ -382,7 +382,7 @@ void Configuration::processLocationDir(std::vector<std::string>::iterator& it, s
     conf.locationStruct.push_back(newDir);
     it++;
     int bracketCounter = 0;
-    while (it != body.end())
+    while (it != body.end() - 1)
     {
         if (*it == "location" && (*(it + 1)).find("/") != std::string::npos)
         {

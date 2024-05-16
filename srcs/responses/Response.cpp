@@ -377,7 +377,7 @@ void	Response::sendResponse(Server* server, int fd, std::string file, int code)
 	{
 		response = _httpResponse;
 		send(fd, response.c_str(), response.size(), 0);
-		close(fd);
+		//close(fd);
 	}
 	else 
 	{
@@ -407,6 +407,7 @@ void	Response::sendResponse(Server* server, int fd, std::string file, int code)
 			throw ResponseException("HTML file doesn't exist or is inaccessible.");
 		}
 	}
+	std::cout << "WHAT IS THE CODE? " << code << std::endl;
 	gfullRequest.clear();
 }
 

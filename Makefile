@@ -6,7 +6,7 @@
 #    By: lde-sous <lde-sous@student.42porto.com>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/14 15:37:50 by lde-sous          #+#    #+#              #
-#    Updated: 2024/05/14 14:51:20 by lde-sous         ###   ########.fr        #
+#    Updated: 2024/05/16 15:38:36 by lde-sous         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,7 @@
 #----------COMANDS----------#
 
 CXX = c++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -g
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -fsanitize=address
 RM = rm -rf
 
 #----------DIRS----------#

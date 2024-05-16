@@ -118,7 +118,6 @@ int		Request::fillHeader(int socket)
 	}
 	return 0;
 }
-
 /* ===================== Getter Functions ===================== */
 
 std::string	Request::getMethod() const
@@ -601,6 +600,8 @@ const char *Request::RequestException::what() const throw()
 void	Request::chunkDecoder()
 {
 	size_t pos = gfullRequest.find("\r\n\r\n");
+	if (pos == std::string::npos)
+		return ;
 	std::istringstream chunks(gfullRequest.substr(pos + 4));
 	std::string	line;
 	size_t size = 0;

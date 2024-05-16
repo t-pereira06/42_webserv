@@ -90,7 +90,7 @@
 
 # define KEYWORDS "listen server_name root index allow_methods error_page client_max_body_size cgi_pass redirect autoindex alias"
 # define MAX_EVENT_BUFFER 42
-# define ACTIVITY_TIMEOUT 60 // 1 min
+# define ACTIVITY_TIMEOUT 30 // 30sec
 
 /* ===================== Global Variable ===================== */
 

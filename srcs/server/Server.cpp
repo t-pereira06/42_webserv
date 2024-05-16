@@ -298,7 +298,6 @@ int	Server::postCGI(const std::string& uri, int fd, Request& req, Response& resp
 			return (reqCode);
 		}
 		std::string contentlen(req.getHeader("Content-Length"));
-		std::cout << "CONTENT BODY - > " << contentlen << std::endl;
 		envCGI(_serverConfig, uri, _envp, req);
 		if (std::atoi(contentlen.c_str()) == 0) 
 		{
@@ -324,7 +323,6 @@ int	Server::postCGI(const std::string& uri, int fd, Request& req, Response& resp
 				if (file && (file->name.find(fileExt) != std::string::npos) && file->cgi_pass.find(uri) != std::string::npos) 
 				{
 					std::string method = _envp.request_method.substr(_envp.request_method.find_first_of('=') + 1);
-					std::cout << "METHOD -> " <<  method << std::endl;
 					if (std::find(file->allow_methods.begin(), file->allow_methods.end(), method) != file->allow_methods.end()) 
 					{
 						executeCGIScript("." + file->cgi_pass, req, fd,	resp);
@@ -354,9 +352,8 @@ int	Server::postCGI(const std::string& uri, int fd, Request& req, Response& resp
 							// Check if the file is the same type as uri
 							if (file && (file->name.find(fileExt) != std::string::npos) && file->cgi_pass.find(uri) != std::string::npos) 
 							{
-								std::cout << "cgi needs to be: " << file->cgi_pass << std::endl;
-								std::string method = _envp.request_method.substr(_envp.request_method.find_first_of('=') + 1);
-								std::cout << "METHOD -> " <<  method << std::endl;
+								size_t posss = _envp.request_method.find_first_of('=') + 1;
+								std::string method = _envp.request_method.substr(posss);
 								if (std::find(file->allow_methods.begin(), file->allow_methods.end(), method) != file->allow_methods.end()) 
 								{
 									executeCGIScript("." + file->cgi_pass, req, fd,	resp);
