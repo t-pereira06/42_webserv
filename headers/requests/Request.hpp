@@ -44,15 +44,15 @@ class Request
 		Request(const Request& original);
 		Request& operator=(const Request& original);
 		~Request();
-		int		fillHeader(int socket);
-		int		fillAttributes(const std::string& request);
-		void	parseRequest();
+		int			fillHeader(int socket);
+		int			fillAttributes(const std::string& request);
+		void		parseRequest();
 		std::string trimValue(std::string toBeTrimmed);
 		std::string parseFilename(std::string ClearDisposition);
-		void parseContentType(std::string ContentType);
+		void 		parseContentType(std::string ContentType);
 		std::string bodyParser();
 		std::string getHeader(const std::string& headerName);
-		bool checkMethod(Server* server);
+		bool 		checkMethod(Server* server);
 		std::string	getMethod() const;
 		std::string	getURI() const;
 		std::string	getHTTPVersion() const;
@@ -62,10 +62,10 @@ class Request
 		std::string	getBody() const;
 		std::string	getHost() const;
 		double		getContentLength();
-		int		ConfigureRequest(Server *server);
-		void	chunkDecoder();
-		void	reqLogger(std::string request);
-		int		checkClientBodySize(Server* server);
+		int			ConfigureRequest(Server *server);
+		void		chunkDecoder();
+		void		reqLogger(std::string request);
+		int			checkClientBodySize(Server* server);
 		
 		class RequestException : public std::exception
 		{

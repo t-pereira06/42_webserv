@@ -60,11 +60,11 @@ struct LocationFiles : BaseLocation
  */
 struct LocationDir : BaseLocation
 {
-	std::string					name;
-	std::string					alias;
-	std::string					redirect;
-	std::string					root;
-	bool						autoindex;
+	std::string								name;
+	std::string								alias;
+	std::string								redirect;
+	std::string								root;
+	bool									autoindex;
 	std::vector<std::string>				allow_methods;
 	std::vector<std::string>				index;
 	std::vector<LocationFiles*>	files;
@@ -103,11 +103,11 @@ typedef struct s_listen
  */
 typedef struct s_server_conf
 {
-	std::vector<std::string>					server_name;
+	std::vector<std::string>		server_name;
 	std::string						server_root;
-	std::vector<std::string>					index;
+	std::vector<std::string>		index;
 	std::string						indexFile;
-	std::vector<std::string>					allow_methods;
+	std::vector<std::string>		allow_methods;
 	std::map<int, std::string>		errorPages;
 	unsigned int					client_max_body_size;
 	std::vector<BaseLocation*>	locationStruct;
