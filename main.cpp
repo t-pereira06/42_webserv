@@ -6,7 +6,7 @@
 /*   By: lde-sous <lde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/06 15:36:38 by lde-sous          #+#    #+#             */
-/*   Updated: 2024/02/06 15:36:38 by lde-sous         ###   ########.fr       */
+/*   Updated: 2024/05/17 12:50:24 by lde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,26 +56,32 @@ extern "C" void	signalHandler(int signum)
     std::cout << std::endl;
 }
 
-void printWebServLogo() 
+void printWebServLogo(char **envp)
 {
-
-    std::cout << BOLD << RED << "\n";
-    std::cout << " █     █░  ▓█████    ▄▄▄▄       ██████   ▓█████    ██▀███     ██▒   █▓\n";
-    std::cout << " ▓█░ █ ░█  ░▓█   ▀   ▓█████▄   ▒██    ▒   ▓█   ▀   ▓██ ▒ ██▒  ▓██░   █▒\n";
-    std::cout << "▒█░ █ ░█   ▒███     ▒██▒ ▄██░   ▓██▄     ▒███     ▓██ ░▄█ ▒   ▓██  █▒░\n";
-    std::cout << "░█░ █ ░█   ▒▓█  ▄   ▒██░█▀      ▒   ██▒  ▒▓█  ▄   ▒██▀▀█▄      ▒██ █░░\n";
-    std::cout << "░░██▒██▓   ░▒████▒░  ▓█  ▀█▓  ▒██████▒  ▒░▒████▒  ░██▓ ▒██▒     ▒▀█░  \n";
-    std::cout << "░ ▓░▒ ▒    ░░ ▒░ ░  ░▒▓███▀▒▒   ▒▓▒ ▒   ░░░ ▒░ ░  ░ ▒▓ ░▒▓░     ░ ▐░  \n";
-    std::cout << "  ▒ ░ ░     ░ ░  ░  ▒░▒   ░ ░   ░▒  ░   ░ ░ ░  ░    ░▒ ░ ▒░     ░ ░░  \n"; 
+	pid_t pid = fork();
+	if (pid == 0)
+	{
+		 char* argv[] = {NULL};
+		if (execve("/usr/bin/clear", argv, envp) == -1)
+			exit (EXIT_FAILURE);
+	}
+	waitpid(pid, NULL, 0);
+	std::cout << BOLD << RED << "\n";
+	std::cout << " █     █░  ▓█████    ▄▄▄▄       ██████   ▓█████    ██▀███     ██▒   █▓\n";
+	std::cout << " ▓█░ █ ░█  ░▓█   ▀   ▓█████▄   ▒██    ▒   ▓█   ▀   ▓██ ▒ ██▒  ▓██░   █▒\n";
+	std::cout << "▒█░ █ ░█   ▒███     ▒██▒ ▄██░   ▓██▄     ▒███     ▓██ ░▄█ ▒   ▓██  █▒░\n";
+	std::cout << "░█░ █ ░█   ▒▓█  ▄   ▒██░█▀      ▒   ██▒  ▒▓█  ▄   ▒██▀▀█▄      ▒██ █░░\n";
+	std::cout << "░░██▒██▓   ░▒████▒░  ▓█  ▀█▓  ▒██████▒  ▒░▒████▒  ░██▓ ▒██▒     ▒▀█░  \n";
+	std::cout << "░ ▓░▒ ▒    ░░ ▒░ ░  ░▒▓███▀▒▒   ▒▓▒ ▒   ░░░ ▒░ ░  ░ ▒▓ ░▒▓░     ░ ▐░  \n";
+	std::cout << "  ▒ ░ ░     ░ ░  ░  ▒░▒   ░ ░   ░▒  ░   ░ ░ ░  ░    ░▒ ░ ▒░     ░ ░░  \n"; 
 	std::cout << "  ░   ░       ░      ░    ░ ░    ░  ░       ░       ░░   ░        ░░  \n";
 	std::cout << "    ░         ░  ░   ░              ░       ░  ░     ░             ░  \n";
 	std::cout << "                       ░                                 ░" << RESET << std::endl;
-
 }
 
-int		main(int ac, char **av)
+int		main(int ac, char **av, char **envp)
 {
-    printWebServLogo();
+    printWebServLogo(envp);
     std::string filename;
     signal(SIGPIPE, SIG_IGN);
     if (ac != 2)

@@ -19,7 +19,7 @@ bool firstChunk = true;
 /* ===================== Orthodox Canonical Form ===================== */
 
 Request::Request() : _method(""), _uri(""), _httpVersion(""),
-_firstLine(""), _fullRequest(""), _isChunked(false), _isRequestComplete(false)
+_firstLine(""), _fullRequest(""), _isPageOK(true), _isChunked(false), _isRequestComplete(false)
 {
 }
 
@@ -32,6 +32,7 @@ Request::Request(const Request& original)
 	_fullRequest = original._fullRequest;
 	_isChunked = original._isChunked;
 	_isRequestComplete = original._isRequestComplete;
+	_isPageOK = original._isPageOK;
 }
 
 Request& Request::operator=(const Request& original)
@@ -45,6 +46,7 @@ Request& Request::operator=(const Request& original)
 		_fullRequest = original._fullRequest;
 		_isChunked = original._isChunked;
 		_isRequestComplete = original._isRequestComplete;
+		_isPageOK = original._isPageOK;
 	}
 	return (*this);
 }
@@ -305,7 +307,9 @@ std::string Request::bodyParser()
 			return "";
 		}
 		startPos += 4;
+		std::cout << "boundary: " << _boundary << std::endl;
 		std::string::size_type endPos = _fullRequest.find(finalBoundary, startPos);
+		std::cout << "endpos is: " << endPos << std::endl;
 		if (endPos == std::string::npos)
 		{
 			std::cerr << "Final boundary marker not found." << std::endl;
@@ -419,6 +423,7 @@ bool Request::checkMethod(Server* server)
 			std::cout << "Failed Casting on Request::checkMethod" << std::endl;
 		}
 	}
+	_isPageOK = false;
 	return false;
 }
 
@@ -480,7 +485,11 @@ int	Request::ConfigureRequest(Server* server)
 				return (code);
 		}
 		if (!checkMethod(server))
+		{
+			if (_isPageOK == false)
+				return (404);
 			return (405);
+		}
 	}
 	catch (std::exception &e)
 	{
@@ -621,5 +630,4 @@ void	Request::chunkDecoder()
 		}
 		flag++;
 	}
-	std::cout << _requestBody << std::endl;
 }

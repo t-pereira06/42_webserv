@@ -36,6 +36,7 @@ class Request
 		std::string _contentLength;
 		std::string _file;
 		std::string _host;
+		bool		_isPageOK;
 
 	public:
 		bool		_isChunked;
