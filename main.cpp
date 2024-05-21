@@ -56,7 +56,7 @@ extern "C" void	signalHandler(int signum)
     std::cout << std::endl;
 }
 
-void printWebServLogo(char **envp)
+void printIntro(char **envp)
 {
 	pid_t pid = fork();
 	if (pid == 0)
@@ -67,21 +67,31 @@ void printWebServLogo(char **envp)
 	}
 	waitpid(pid, NULL, 0);
 	std::cout << BOLD << RED << "\n";
+	usleep(200000);
 	std::cout << " █     █░  ▓█████    ▄▄▄▄       ██████   ▓█████    ██▀███     ██▒   █▓\n";
+	usleep(37000);
 	std::cout << " ▓█░ █ ░█  ░▓█   ▀   ▓█████▄   ▒██    ▒   ▓█   ▀   ▓██ ▒ ██▒  ▓██░   █▒\n";
+	usleep(37000);
 	std::cout << "▒█░ █ ░█   ▒███     ▒██▒ ▄██░   ▓██▄     ▒███     ▓██ ░▄█ ▒   ▓██  █▒░\n";
+	usleep(37000);
 	std::cout << "░█░ █ ░█   ▒▓█  ▄   ▒██░█▀      ▒   ██▒  ▒▓█  ▄   ▒██▀▀█▄      ▒██ █░░\n";
+	usleep(37000);
 	std::cout << "░░██▒██▓   ░▒████▒░  ▓█  ▀█▓  ▒██████▒  ▒░▒████▒  ░██▓ ▒██▒     ▒▀█░  \n";
+	usleep(97000);
 	std::cout << "░ ▓░▒ ▒    ░░ ▒░ ░  ░▒▓███▀▒▒   ▒▓▒ ▒   ░░░ ▒░ ░  ░ ▒▓ ░▒▓░     ░ ▐░  \n";
+	usleep(287000);
 	std::cout << "  ▒ ░ ░     ░ ░  ░  ▒░▒   ░ ░   ░▒  ░   ░ ░ ░  ░    ░▒ ░ ▒░     ░ ░░  \n"; 
+	usleep(387000);
 	std::cout << "  ░   ░       ░      ░    ░ ░    ░  ░       ░       ░░   ░        ░░  \n";
+	usleep(497000);
 	std::cout << "    ░         ░  ░   ░              ░       ░  ░     ░             ░  \n";
+	usleep(597000);
 	std::cout << "                       ░                                 ░" << RESET << std::endl;
 }
 
 int		main(int ac, char **av, char **envp)
 {
-    printWebServLogo(envp);
+    printIntro(envp);
     std::string filename;
     signal(SIGPIPE, SIG_IGN);
     if (ac != 2)
