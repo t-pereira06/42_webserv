@@ -788,7 +788,7 @@ void	Server::executePost(Request& req)
     }
     // Write new data to the file
     file << req.getBody();
-	file << "---------------------------" << std::endl;
+	file << "───────────────── // ─────────────────" << std::endl;
     file.close();
 	std::cout << "Comment added successfully" << std::endl;
 }
@@ -869,7 +869,6 @@ int	Server::sender(int socket)
 		}
 		else if (cgi == 405 || cgi == 404)
 		{
-			std::cout << "2: "<< reqCode << std::endl;
 			resp.sendResponse(this, fd, resp.getErrorPage(cgi, _serverConfig), cgi);
 			_isCGI = false;
 			return (0);
@@ -923,7 +922,6 @@ int	Server::sender(int socket)
 	{
 		// Finding the correct error page file path and sending the appropriate response
 		std::string errorPath = resp.getErrorPage(reqCode, this->_serverConfig);
-		std::cout << "3: "<< reqCode << std::endl;
 		resp.sendResponse(this, fd, errorPath, reqCode);
 		return 0;
 	}

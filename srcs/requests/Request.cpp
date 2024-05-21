@@ -308,9 +308,7 @@ std::string Request::bodyParser()
 			return "";
 		}
 		startPos += 4;
-		//std::cout << "boundary: " << _boundary << std::endl;
 		std::string::size_type endPos = _fullRequest.find(finalBoundary, startPos);
-		//std::cout << "endpos is: " << endPos << std::endl;
 		if (endPos == std::string::npos)
 		{
 			std::cerr << "Final boundary marker not found." << std::endl;
