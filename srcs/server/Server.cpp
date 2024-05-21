@@ -283,7 +283,6 @@ void	Server::deleteCGI(const std::string& uri, int fd, Request& req, Response& r
  */
 int	Server::postCGI(const std::string& uri, int fd, Request& req, Response& resp, int& reqCode) 
 {
-
 	// Checking if request is POST
 	if (req.getMethod() == "POST")
 	{
@@ -516,7 +515,6 @@ int Server::getCGI(const std::string& uri, int fd, Request& req, Response& resp)
  */
 int Server::CGI(const std::string& uri, int fd, Request& req, Response& resp, int& reqCode) 
 {
-
 	int cgi = 0;
 
 	deleteCGI(uri, fd, req, resp);
@@ -692,7 +690,6 @@ void Server::executeUploadCGIScript(const std::string& scriptPath, Request& req,
 
 void	Server::executeCGIScript(const std::string& scriptPath, Request& req, int fd, Response& resp) 
 {
-
 	if (scriptPath.find("upload.py") != std::string::npos) 
 	{
 		executeUploadCGIScript(scriptPath, req, fd, resp);
@@ -853,7 +850,6 @@ int	Server::sender(int socket)
 	{
 		// Parse the request URI, METHOD and HTTP VERSION. Returns appropriate response codes
 		reqCode = req.ConfigureRequest(this);
-
 		std::string host(req.getHost());
 		std::size_t pos = host.find(':');
 		if (pos != std::string::npos)
@@ -873,6 +869,7 @@ int	Server::sender(int socket)
 		}
 		else if (cgi == 405 || cgi == 404)
 		{
+			std::cout << "2: "<< reqCode << std::endl;
 			resp.sendResponse(this, fd, resp.getErrorPage(cgi, _serverConfig), cgi);
 			_isCGI = false;
 			return (0);
@@ -926,6 +923,7 @@ int	Server::sender(int socket)
 	{
 		// Finding the correct error page file path and sending the appropriate response
 		std::string errorPath = resp.getErrorPage(reqCode, this->_serverConfig);
+		std::cout << "3: "<< reqCode << std::endl;
 		resp.sendResponse(this, fd, errorPath, reqCode);
 		return 0;
 	}
@@ -970,12 +968,11 @@ int	Server::sender(int socket)
 	{
 			if ((_serverConfig.indexFile.empty() && !resp.getRedirectFlag()) || path == "404" || path == "400") 
 			{
-
 				// Check path if path is a Bad Request, if not default to Page Not Found
-				if (path == "400")
-					resp.sendResponse(this, fd, resp.getErrorPage(400, getConf()), 400);
+				if (path == "400" || path == "404")
+					resp.sendResponse(this, fd, resp.getErrorPage(atoi(path.c_str()), getConf()), atoi(path.c_str()));
 				else
-					resp.sendResponse(this, fd, resp.getErrorPage(404, getConf()), 404);
+					resp.sendResponse(this, fd, resp.getErrorPage(200, getConf()), 200);
 			}
 			else
 				resp.sendResponse(this, fd, (path + _serverConfig.indexFile), reqCode);

@@ -84,10 +84,10 @@ int		Request::fillHeader(int socket)
 		if (firstLine == false)
 		{
 			size_t len = pos - buffer;
-			_firstLine.append(static_cast<std::string>(buffer).substr(0, len));
+			_firstLine.append(buffer, len);
 			firstLine = true;
 		}
-		_fullRequest.append(static_cast<std::string>(buffer));
+		_fullRequest.append(buffer, bytesRead);
 		if (chunky && strstr(_fullRequest.c_str(), "\r\n0\r\n\r\n"))
 		{
 			parseRequest();
@@ -95,6 +95,7 @@ int		Request::fillHeader(int socket)
 			chunky = false;
 			_isRequestComplete = true;
 			chunkDecoder();
+			std::cout << _requestBody << std::endl;
 			firstChunk = true;
 			return 1;
 		}
@@ -307,9 +308,9 @@ std::string Request::bodyParser()
 			return "";
 		}
 		startPos += 4;
-		std::cout << "boundary: " << _boundary << std::endl;
+		//std::cout << "boundary: " << _boundary << std::endl;
 		std::string::size_type endPos = _fullRequest.find(finalBoundary, startPos);
-		std::cout << "endpos is: " << endPos << std::endl;
+		//std::cout << "endpos is: " << endPos << std::endl;
 		if (endPos == std::string::npos)
 		{
 			std::cerr << "Final boundary marker not found." << std::endl;
@@ -368,7 +369,7 @@ bool Request::checkMethod(Server* server)
 					(_method == "DELETE" && std::find(dir->allow_methods.begin(), dir->allow_methods.end(), "DELETE") != dir->allow_methods.end()))
 						return true;
 			}
-			else if(dir)
+			else if (dir)
 			{
 				std::vector<LocationFiles*>::iterator file_it = dir->files.begin();
 				for(; file_it != dir->files.end(); ++file_it)

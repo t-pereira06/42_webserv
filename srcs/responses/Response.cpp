@@ -141,7 +141,6 @@ const std::string Response::findRoot(Server* server, const std::string& uri)
 
 	// Set default as 404
 	std::string result = "404";
-
 	// If uri is / it means we're at the server root
 	if (uri == "/")
 		result = "/";
@@ -152,7 +151,6 @@ const std::string Response::findRoot(Server* server, const std::string& uri)
 		LocationDir* dir = dynamic_cast<LocationDir*>(*it);
 		if (dir && dir->name == uri) 
 		{
-
 			// Check if alias is defined in config file and we've not setted result with the alias previously
 			if (!dir->alias.empty() && !_isAlias) 
 			{
@@ -172,15 +170,15 @@ const std::string Response::findRoot(Server* server, const std::string& uri)
 			{
 				result = dir->redirect;
 				_isRedirect = true;
-
 				// Update _httpResponse object for redirect
 				redirURL(result);
 				if (_httpResponse == "400")
 					return (_isRedirect = false, "400"); // Turn flag off so we don't trigger a redirect send in the sendResponse function
 				break ;
 			}
-			else
+			else {
 				return ("404");
+			}
 		}
 	}
 
@@ -244,6 +242,8 @@ std::string	Response::selectIndexFile(Server* server, int fd, const std::vector<
 	std::string newroot;
 	std::string locationRoot;
 
+	if (_isRedirect)
+		return ("200");
 	// Check if directory listing is off and we're trying to access via directory
 	LocationDir* dir = getDir(server, uri);
 	if(dir) 
@@ -407,7 +407,6 @@ void	Response::sendResponse(Server* server, int fd, std::string file, int code)
 			throw ResponseException("HTML file doesn't exist or is inaccessible.");
 		}
 	}
-	std::cout << "WHAT IS THE CODE? " << code << std::endl;
 	gfullRequest.clear();
 }
 
@@ -461,7 +460,6 @@ void	Response::redirURL(const std::string& url)
 	std::string rdc;
 	std::string url_tmp(url);
 	// Checking if we're setting the redirect URL correctly
-
 	// If we find localhost at the beginning of the redirect, then we say the redirect will be either root '/' or a location '/....'
 	if (url_tmp.find("localhost") == 0) 
 	{
@@ -469,8 +467,9 @@ void	Response::redirURL(const std::string& url)
 			url_tmp.append("/");
 		rdc = url_tmp.substr(url_tmp.find("/"), std::string::npos);
 	} 
-	else if (url_tmp.find("http") == 0)	// If we are doing a redirect to another domain or website, then the url needs to be preceded by http or https
+	else if (url_tmp.find("http") == 0) {
 		rdc = url_tmp;
+	}
 	else 
 	{
 		_httpResponse = "400";	// If the previous rules aren't followed we update the response to generate a 400 Bad Request Error
