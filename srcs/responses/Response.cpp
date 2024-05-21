@@ -274,7 +274,7 @@ std::string	Response::selectIndexFile(Server* server, int fd, const std::vector<
 			if (locationRoot == "404" || locationRoot == "400")
 				return (locationRoot);
 			else if (_isRedirect)
-				return ("REDIRECT"); // Useless return, but it's ok
+				return ("200"); // Useless return, but it's ok
 			// Recursively search for the index file, now in root
 			newroot = selectIndexFile(server, fd, indexVector, size, (server->getConf().server_root + locationRoot), uri, autoindex, possibleIndex);
 				return (newroot);
@@ -377,7 +377,7 @@ void	Response::sendResponse(Server* server, int fd, std::string file, int code)
 	{
 		response = _httpResponse;
 		send(fd, response.c_str(), response.size(), 0);
-		//close(fd);
+		close(fd);
 	}
 	else 
 	{
