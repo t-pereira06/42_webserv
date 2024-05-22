@@ -245,7 +245,7 @@ void	Configuration::checkSvRoot(std::vector<std::string>& body, t_server_config&
 			it++;
 			conf.server_root = *it;
 			if (conf.server_root[conf.server_root.length() - 1] != '/')
-				conf.server_root.append("/");
+				conf.server_root += "/";
 			break ;
 		}
 		else if (*it == "location")

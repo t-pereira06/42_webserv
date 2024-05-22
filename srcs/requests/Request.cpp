@@ -72,11 +72,14 @@ Request::~Request()
 
 int		Request::fillHeader(int socket)
 {
-	char buffer[1024];
+	char buffer[500];
 	bool firstLine = false;
 	while(1)
 	{
+		bzero(buffer, 500);
 		ssize_t bytesRead = recv(socket, buffer, sizeof(buffer) - 1, MSG_DONTWAIT);
+		std::cout << bytesRead << std::endl;
+		std::cout << buffer << std::endl;
 		if (bytesRead <= 0)
 			break;
 		buffer[bytesRead] = 0;
@@ -84,10 +87,10 @@ int		Request::fillHeader(int socket)
 		if (firstLine == false)
 		{
 			size_t len = pos - buffer;
-			_firstLine.append(buffer, len);
+			std::copy(buffer, buffer + len, std::back_inserter(_firstLine));
 			firstLine = true;
 		}
-		_fullRequest.append(buffer, bytesRead);
+		std::copy(buffer, buffer + bytesRead, std::back_inserter(_fullRequest));
 		if (chunky && strstr(_fullRequest.c_str(), "\r\n0\r\n\r\n"))
 		{
 			parseRequest();
@@ -112,10 +115,10 @@ int		Request::fillHeader(int socket)
 		parseRequest();
 		if (chunky)
 		{		
-			gfullRequest.append(_fullRequest);
+			gfullRequest += _fullRequest;
 			return 1;
 		}
-		gfullRequest.append(_fullRequest);
+			gfullRequest += _fullRequest;
 		reqLogger(gfullRequest);
 		firstChunk = true;
 	}
@@ -213,7 +216,7 @@ void	Request::parseRequest()
 		firstChunk = false;
 	}
 	else
-		gfullRequest.append(_fullRequest);
+		gfullRequest += _fullRequest;
 }
 
 /**

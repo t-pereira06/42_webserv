@@ -434,7 +434,7 @@ void	Response::sendResponseCGI(int read_fd, int write_fd, int clientSocket)
     while ((bytesRead = read(read_fd, buffer, bufferSize)) > 0) 
 	{
         // Append the data read to the std::string object
-        content.append(buffer, bytesRead);
+		std::copy(buffer, buffer + bytesRead, std::back_inserter(content));
 		close(write_fd);
     }
 	std::stringstream headers;
@@ -464,18 +464,16 @@ void	Response::redirURL(const std::string& url)
 	if (url_tmp.find("localhost") == 0) 
 	{
 		if (url_tmp.find("/") != url_tmp.length() - 1)
-			url_tmp.append("/");
+			url_tmp += "/";
 		rdc = url_tmp.substr(url_tmp.find("/"), std::string::npos);
 	} 
-	else if (url_tmp.find("http") == 0) {
+	else if (url_tmp.find("http") == 0)
 		rdc = url_tmp;
-	}
 	else 
 	{
 		_httpResponse = "400";	// If the previous rules aren't followed we update the response to generate a 400 Bad Request Error
 		return ;
 	};
-
 	// If succesfull we update the response header with the correct redirect URL
 	_httpResponse = "HTTP/1.1 302 Found\r\nLocation: " + rdc + "\r\n\r\n";
 }

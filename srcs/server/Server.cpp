@@ -410,9 +410,9 @@ int Server::getCGI(const std::string& uri, int fd, Request& req, Response& resp)
 			closedir(dir);
 			size_t new_pos = uri.find(".py", pos) + 3;
 			if (new_pos != std::string::npos)
-				script.append(uri.substr(pos, new_pos - pos));
+				std::copy(uri.begin() + pos, uri.begin() + new_pos, std::back_inserter(script));
 			else
-				script.append(uri.substr(pos, QueryDelim));
+				std::copy(uri.begin() + pos, uri.begin() + pos + QueryDelim, std::back_inserter(script));
 			pos = new_pos;
 			dir = opendir(script.c_str());
 		}
@@ -941,7 +941,7 @@ int	Server::sender(int socket)
 		{
 			indexSize = dir->index.size();
 			indexes = dir->index;
-			rootPath.append(locationRoot);
+			rootPath += locationRoot;
 			wasListed = false;
 		}
 	}

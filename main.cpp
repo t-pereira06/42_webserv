@@ -39,20 +39,21 @@ extern "C" void	signalHandler(int signum)
     }
     (void)signum;
 	gSignalStatus = 1;
-    const char* loadingIcons[] = {".", "..", "..."};
+    const char* loadingIcons[] = {"S", "h", "u", "t", "t", "i", "n", "g", " ", "d", "o", "w", "n", " ", "w", "e", "b", "s", "e", "r", "v", ".", ".", "."};
     const int numIcons = sizeof(loadingIcons) / sizeof(loadingIcons[0]);
 
-    std::cout << "Closing program safely ";
+    //std::cout << "Closing program safely ";
     std::cout.flush();
 
-    for (int j = 0; j < 3; ++j)
+    for (int j = 0; j < 24; ++j)
     {
-        std::cout << "\r" << BOLD_BLUE << "Closing program safely " << loadingIcons[j % numIcons] << RESET;
+        std::cout << BOLD_BLUE << loadingIcons[j % numIcons] << RESET;
         std::cout.flush();
-        usleep(800000); // Sleep for 100 milliseconds (adjust as needed)
+        usleep(100000); // Sleep for 100 milliseconds (adjust as needed)
     }
-    std::cout << "\r" << BOLD_GREEN << "Closing program safely \u2713" << RESET;
-    std::cout << "                 \n"; // Clear the rest of the line
+    std::cout << "\r" << BOLD_GREEN << "Finished \u2713" << RESET;
+	usleep(200000);
+    std::cout << "                                   \n"; // Clear the rest of the line
     std::cout << std::endl;
 }
 
