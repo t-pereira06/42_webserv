@@ -78,8 +78,6 @@ int		Request::fillHeader(int socket)
 	{
 		bzero(buffer, 500);
 		ssize_t bytesRead = recv(socket, buffer, sizeof(buffer) - 1, MSG_DONTWAIT);
-		std::cout << bytesRead << std::endl;
-		std::cout << buffer << std::endl;
 		if (bytesRead <= 0)
 			break;
 		buffer[bytesRead] = 0;

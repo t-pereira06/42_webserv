@@ -74,7 +74,7 @@ void	Cluster::setPollFD()
 			pfd.events = POLLIN; //read events
 			pfd.revents = 0;
 			_pollFDs.push_back(pfd);
-			_fdToServerMap[(*it)->getFD()] = *it;
+			_fdMap[(*it)->getFD()] = *it;
 		}
 	}
 }
@@ -279,12 +279,12 @@ int Cluster::checkTimeout(int epoll_fd, struct epoll_event* event_buffer)
 
 	// Get current system time
 	time_t now = time(NULL);
-	std::map<int, Server*>::iterator it = _fdToServerMap.begin();
+	std::map<int, Server*>::iterator it = _fdMap.begin();
 
 	// Skip first N positions on map so not to close base servers
 	std::advance(it, _numberOfSv);
 
-	for (; it != _fdToServerMap.end(); ++it) 
+	for (; it != _fdMap.end(); ++it) 
 	{
 		int fd = it->first;
 
@@ -292,7 +292,7 @@ int Cluster::checkTimeout(int epoll_fd, struct epoll_event* event_buffer)
 		if (_activityTime[fd] && now - _activityTime[fd] > ACTIVITY_TIMEOUT) 
 		{
 			// Inactive connection found, remove from event_buffer
-			it->second->closeConnections(fd, epoll_fd, event_buffer, _fdToServerMap, _activityTime);
+			it->second->closeConnections(fd, epoll_fd, event_buffer, _fdMap, _activityTime);
 			return (2);
 		}
 	}
@@ -378,10 +378,10 @@ void	Cluster::startServers()
 		for (size_t i = 0; i < _pollFDs.size(); i++) 
 		{
 			events.data.fd = _pollFDs[i].fd;
-			_fdToServerMap[_pollFDs[i].fd] = getServer(_pollFDs[i].fd);
+			_fdMap[_pollFDs[i].fd] = getServer(_pollFDs[i].fd);
 			_serverSockets.push_back(_pollFDs[i].fd);
 			if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, events.data.fd, &events) < 0)
-				throw ClusterException("Failed controlling epoll for server::" + intToStr(_fdToServerMap[_pollFDs[i].fd]->getListen().port));
+				throw ClusterException("Failed controlling epoll for server::" + intToStr(_fdMap[_pollFDs[i].fd]->getListen().port));
 		}
 		// Main Servers Listen
 		while (!gSignalStatus) 
@@ -399,12 +399,7 @@ void	Cluster::startServers()
 			{
 				// First N times, client socket will be each servers base socket
 				int client_socket = event_buffer[i].data.fd;
-				if(event_buffer[i].events & EPOLLERR) 
-				{
-					close(event_buffer[i].data.fd);
-					continue;
-				}
-				else if(event_buffer[i].events & EPOLLHUP) 
+				if(event_buffer[i].events & EPOLLERR || event_buffer[i].events & EPOLLHUP ) 
 				{
 					close(event_buffer[i].data.fd);
 					continue;
@@ -417,12 +412,11 @@ void	Cluster::startServers()
 					client_socket = accept(event_buffer[i].data.fd, (sockaddr*)&client_address, (socklen_t*)&addrlen);
 					if (client_socket < 0)
 						continue ;
-					event_buffer[i].events = EPOLLIN;
-					event_buffer[i].events |= EPOLLOUT;
+					event_buffer[i].events = EPOLLIN | EPOLLOUT;
 					// Link connection socket to the corresponding server socket
 					// While setting non-block flags for the connection
-					_fdToServerMap[client_socket] = _fdToServerMap[event_buffer[i].data.fd];
-					_fdToServerMap[client_socket]->setNonBlock(client_socket);
+					_fdMap[client_socket] = _fdMap[event_buffer[i].data.fd];
+					_fdMap[client_socket]->setNonBlock(client_socket);
 					event_buffer[i].data.fd = client_socket;
 					// Add the connection to the buffer
 					if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_socket, &event_buffer[i]) < 0)
@@ -434,11 +428,11 @@ void	Cluster::startServers()
 					try 
 					{
 						if(event_buffer[i].events & EPOLLIN)
-							connectionHandler(client_socket, _fdToServerMap[client_socket]);
+							connectionHandler(client_socket, _fdMap[client_socket]);
 					} 
 					catch (std::exception &e) 
 					{
-						_fdToServerMap[client_socket]->closeConnections(client_socket, epoll_fd, event_buffer, _fdToServerMap, _activityTime);
+						_fdMap[client_socket]->closeConnections(client_socket, epoll_fd, event_buffer, _fdMap, _activityTime);
 						std::cerr << e.what() << std::endl;
 					}
 					// If checkTimeout closes a fd then go back to the beginning, so as not to iterate over possible removed FDs from buffer
@@ -499,8 +493,8 @@ void Cluster::promptInfo()
               << RESET << BOLD << std::setw(13) << "Address" << " | " 
               << RESET << BOLD << std::setw(10) << "Port" << " |" << std::endl;
     std::cout << RED << "─────────────────────────────────────────────────────────────────────────" << RESET << std::endl;
-	std::map<int, Server*>::iterator	it = _fdToServerMap.begin();
-    for (; it != _fdToServerMap.end(); ++it) 
+	std::map<int, Server*>::iterator	it = _fdMap.begin();
+    for (; it != _fdMap.end(); ++it) 
 	{
 		Server* server = it->second;
         std::time_t timestamp = std::time(NULL);

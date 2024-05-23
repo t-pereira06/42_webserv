@@ -30,7 +30,7 @@ class	Cluster
 		size_t					_numberOfSv;
 		std::vector<Server*>	 _servers;
 		std::vector<pollfd> 	_pollFDs;
-		std::map<int, Server*> 	_fdToServerMap;
+		std::map<int, Server*> 	_fdMap;
 		std::map<int, time_t> 	_activityTime;
 		std::vector<int>		_serverSockets;
 		Configuration			_config;
