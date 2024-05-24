@@ -90,7 +90,7 @@
 
 # define KEYWORDS "listen server_name root index allow_methods error_page client_max_body_size cgi_pass redirect autoindex alias"
 # define MAX_EVENT_BUFFER 1
-# define ACTIVITY_TIMEOUT 30 // 30sec
+# define ACTIVITY_TIMEOUT 10
 
 /* ===================== Global Variable ===================== */
 
@@ -108,6 +108,7 @@ bool			createDirectory(const char *path);
 std::map<std::string, std::string> 	createLocalKeyMap();
 int             createListHTML(std::string location, std::ofstream& file);
 std::string     intToStr(int number);
+void slowCout(const std::string& str);
 
 template <typename T> void	invertStack(std::stack<T>& original);
 template <typename T> void	invertVector(std::vector<T>& original);

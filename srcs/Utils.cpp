@@ -168,3 +168,11 @@ std::map<std::string, std::string> createLocalKeyMap()
 	return (keyMap);
 }
 
+void slowCout(const std::string& str)
+{
+	for (size_t i = 0; i < str.size(); ++i)
+	{
+		std::cout << str[i];
+		usleep(50000);
+	}
+}

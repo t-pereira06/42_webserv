@@ -562,7 +562,7 @@ void Server::executeDeleteCGIScript(const std::string& scriptPath, Request& req,
 	pid_t pid = fork();  // Create a new process
     if (pid == -1) 
 	{
-        std::cerr << "Failed to fork." << std::endl;
+        std::cout << "Failed to fork." << std::endl;
     } else if (pid > 0) 
 	{
         int status;
@@ -775,7 +775,7 @@ void	Server::executePost(Request& req)
 		std::ofstream outfile("commentDB.txt");
         if (!outfile.is_open()) 
 		{
-            std::cerr << "Error creating file!\n";
+            std::cout << "Error creating file!\n";
             return;
         }
 		outfile.close();
@@ -783,7 +783,7 @@ void	Server::executePost(Request& req)
 	std::ofstream file("commentDB.txt", std::ios_base::app);
     if (!file.is_open()) 
 	{
-        std::cerr << "Error opening file!\n";
+        std::cout << "Error opening file!\n";
         return;
     }
     // Write new data to the file
@@ -861,6 +861,11 @@ int	Server::sender(int socket)
 			return (0);
 		}
 		uri = req.getURI();
+		if (reqCode != 200)
+		{
+			resp.sendResponse(this, fd, resp.getErrorPage(reqCode, getConf()), reqCode);
+			return (0);
+		}
 		int cgi = CGI(uri, fd, req, resp, reqCode);
 		if (_isCGI == true) 
 		{
@@ -918,7 +923,7 @@ int	Server::sender(int socket)
 	}
 	end:
 	// Here we check if any previous function have returned an error
-	if (reqCode != 200) 
+	if (reqCode != 200 && reqCode != 202) 
 	{
 		// Finding the correct error page file path and sending the appropriate response
 		std::string errorPath = resp.getErrorPage(reqCode, this->_serverConfig);

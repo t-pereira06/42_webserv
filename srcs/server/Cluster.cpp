@@ -115,30 +115,30 @@ void	Cluster::initServer()
 {
 	t_listen listenStruct;
 	int i = 0;
-	std::cout << BOLD_RED << "─────────────────────────[" << WHITE << "Parsing " << _config.getSvBlocks().size() << " server(s)" << BOLD_RED << "]──────────────────────────" << RESET << std::endl;
+	std::cout << YELLOW << "Reading " << WHITE << _config.getSvBlocks().size() << YELLOW <<" server(s) from the stack"<< std::endl;
 	while (!_config.getSvBlocks().empty()) 
 	{
 		try
 		{
 			std::cout << "Server " << i + 1 << " \u2192 ";
 			std::cout.flush();
-			const char* loadingIcons[] = {"▁", "▃", "▄", "▅", "▆", "▇", "█", "█", "█", "█", "█"};
+			const char* loadingIcons[] = {"▁", "▃", "▄", "▅", "▆", "▇", "█", "█", "█", "█"};
 			const int numIcons = sizeof(loadingIcons) / sizeof(loadingIcons[0]);
-			for (int j = 0; j < 10; ++j) 
+			for (int j = 0; j < 9; ++j) 
 			{
-				std::cout << "\r" << RED << "Server " << i + 1 << " \u2192 " << loadingIcons[j % numIcons] << RESET;
+				std::cout << "\r" << RED << "Server #" << i + 1 << " \u2192 " << loadingIcons[j % numIcons] << RESET;
 				std::cout.flush();
-				usleep(19000); // Sleep for 100 milliseconds (adjust as needed)
+				usleep(40000); // Sleep for 100 milliseconds (adjust as needed)
 			}
 			invertStack(_config.getSvBlocks());
 			createServer(listenStruct);
 			configureServer(_servers.back());
-			std::cout << "\r" << BOLD_BLUE << "Server " << i + 1 << ": " << BOLD_YELLOW << listenStruct.port << RESET << " \u2192" << GREEN << " \u2713 " << RESET << std::endl; // Unicode check mark symbol
+			std::cout << "\r" << GREEN << "Server #" << i + 1 << ": " << BOLD_GREEN << listenStruct.port << GREEN << " \u2713 " << RESET << std::endl; // Unicode check mark symbol
 			i++;
 		} 
 		catch (std::exception &e) 
 		{
-			std::cout << "\r" << CROSSED_OUT << "Server " << i + 1 << ": " << listenStruct.port << RESET << " \u2192" << RED << " \u2717 " << RESET; // Unicode cross symbol
+			std::cout << "\r" << BOLD_RED CROSSED_OUT << "Server #" << i + 1 << ": " << listenStruct.port << RESET << RED << " \u2717 " << RESET; // Unicode cross symbol
 			std::cout << BLINK << e.what() << RESET << std::endl;
 			clearServer();
 		}
@@ -160,15 +160,15 @@ void	Cluster::initServer()
  */
 void	Cluster::configureServer(Server* server) 
 {
-	callerSemicolon(server);
-	callerDoubles(server);
-	callerServerName(server);
-	callerServerRoot(server);
-	callerIndex(server);
-	callerMethods(server);
-	callerErrorPage(server);
-	callerClientSize(server);
-	callerLocations(server);
+	processSemicolon(server);
+	processDoubles(server);
+	processServerName(server);
+	processServerRoot(server);
+	processIndex(server);
+	processMethods(server);
+	processErrorPage(server);
+	processClientSize(server);
+	processLocations(server);
 	_config.getSvBlocks().pop();
 	_numberOfSv++;
 }
@@ -185,7 +185,7 @@ void	Cluster::configureServer(Server* server)
  */
 void	Cluster::createServer(t_listen& listenStruct) 
 {
-	callerListen(_config.getSvBlocks().top(), listenStruct);
+	processListen(_config.getSvBlocks().top(), listenStruct);
 	_servers.push_back(new Server(listenStruct));
 	std::istringstream iss(_config.getSvBlocks().top());
 	_servers.back()->bodyFiller(iss);
@@ -202,43 +202,43 @@ void	Cluster::createServer(t_listen& listenStruct)
 void Cluster::setupServer() 
 {
     invertVector(_servers);
-    std::cout << std::endl << BOLD_RED << "───────────────────────[" << WHITE << "Initializing " << _servers.size() << " server(s)" << BOLD_RED << "]───────────────────────" << RESET << std::endl;
+    std::cout << std::endl << YELLOW << "Initializing " << WHITE <<_servers.size() << YELLOW << " server(s)" << RESET << std::endl;
 
     for (std::vector<Server*>::iterator it = _servers.begin(); it != _servers.end();) 
 	{
         try 
 		{
-            const char* loadingIcons[] = {"▁", "▃", "▄", "▅", "▆", "▇", "█", "█", "█", "█", "█"};
+            const char* loadingIcons[] = {"▁", "▃", "▄", "▅", "▆", "▇", "█", "█", "█", "█"};
             const int numIcons = sizeof(loadingIcons) / sizeof(loadingIcons[0]);
-            for (int j = 0; j < 10; ++j) 
+            for (int j = 0; j < 9; ++j) 
 			{
                 if (*it) 
 				{
-                    std::cout << "\r" << BOLD_BLUE << "Server " << (*it)->getDynamicListen().port << RESET << " \u2192 " << loadingIcons[j % numIcons] << RESET;
+                    std::cout << "\r" << RED << (*it)->getConf().server_name.front() << " \u2192 " << loadingIcons[j % numIcons];
                     std::cout.flush();
-                    usleep(9000); // Sleep for 100 milliseconds (adjust as needed)
+                    usleep(40000); // Sleep for 100 milliseconds (adjust as needed)
                 }
             }
 
             if (*it) 
 			{
                 (*it)->initServer();
-                std::cout << "\r" << BOLD_BLUE << "Server " << (*it)->getDynamicListen().port << RESET << " \u2192" << GREEN << " \u2713 " << RESET << std::endl; // Unicode check mark symbol
+                std::cout << "\r" << GREEN << (*it)->getConf().server_name.front() << ":" << (*it)->getDynamicListen().port << RESET << BOLD_GREEN << " \u2713   " << RESET << std::endl;
+				std::cout.flush();
                 // UPDATE TO OK
                 ++it; // Move to the next iterator position
             }
         } 
 		catch (std::exception &e) 
 		{
-            std::cout << "\r" << BOLD << RED << "Server " << (*it)->getDynamicListen().port << RESET << " \u2192" << RED << " \u2717 " << RESET; // Unicode cross symbol
-            std::cerr << BLINK << e.what() << std::endl;
+            std::cout << "\r" << BOLD_RED CROSSED_OUT << (*it)->getConf().server_name.front() << ":" << (*it)->getDynamicListen().port << RESET << RED << " \u2717 " << RESET;
+            std::cout << BLINK << e.what() << RESET << std::endl;
             _numberOfSv--;
             delete *it;
             it = _servers.erase(it); // Erase the current element and obtain the iterator to the next element
         }
     }
-
-    std::cout << std::endl << BOLD_RED << "─────────────────────────[" << WHITE << "Running " << _numberOfSv << " server(s)" << BOLD_RED << "]──────────────────────────" << RESET << std::endl;
+    std::cout << std::endl << BOLD_GREEN << "Running " << RESET << _numberOfSv << GREEN << " server(s)" << RESET << std::endl;
 }
 
 /* ===================== Server Monitoring and Cleanup Functions ===================== */
@@ -303,53 +303,53 @@ int Cluster::checkTimeout(int epoll_fd, struct epoll_event* event_buffer)
 
 /* ===================== Configuration Parser Caller Functions ===================== */
 
-void	Cluster::callerSemicolon(Server* server) 
+void	Cluster::processSemicolon(Server* server) 
 {
 	_config.checkSemicolon(server->getDynamicBody());
 }
 
-void	Cluster::callerDoubles(Server *server) 
+void	Cluster::processDoubles(Server *server) 
 {
 	_config.checkDoubles(server->getDynamicBody());
 }
 
-void	Cluster::callerServerName(Server* server) 
+void	Cluster::processServerName(Server* server) 
 {
 	_config.checkSvName(server->getDynamicBody(), server->getDynamicConfig());
 }
 
-void	Cluster::callerListen(std::string& wordStack, t_listen &listen) 
+void	Cluster::processListen(std::string& wordStack, t_listen &listen) 
 {
 	std::istringstream iss(wordStack);
 	_config.processListen(iss, listen);
 }
 
-void	Cluster::callerServerRoot(Server* server) 
+void	Cluster::processServerRoot(Server* server) 
 {
 	_config.checkSvRoot(server->getDynamicBody(), server->getDynamicConfig());
 }
 
-void Cluster::callerErrorPage(Server* server)
+void Cluster::processErrorPage(Server* server)
 {
 	_config.checkErrPage(server->getDynamicBody(), server->getDynamicConfig());
 }
 
-void	Cluster::callerIndex(Server* server) 
+void	Cluster::processIndex(Server* server) 
 {
 	_config.checkIndex(server->getDynamicBody(), server->getDynamicConfig());
 }
 
-void	Cluster::callerMethods(Server* server) 
+void	Cluster::processMethods(Server* server) 
 {
 	_config.checkMethods(server->getDynamicBody(), server->getDynamicConfig());
 }
 
-void	Cluster::callerClientSize(Server* server) 
+void	Cluster::processClientSize(Server* server) 
 {
 	_config.checkClientBodySize(server->getDynamicBody(), server->getDynamicConfig());
 }
 
-void	Cluster::callerLocations(Server* server) 
+void	Cluster::processLocations(Server* server) 
 {
 	_config.checkLocations(server, server->getDynamicBody(), server->getDynamicConfig());
 }
@@ -400,10 +400,7 @@ void	Cluster::startServers()
 				// First N times, client socket will be each servers base socket
 				int client_socket = event_buffer[i].data.fd;
 				if(event_buffer[i].events & EPOLLERR || event_buffer[i].events & EPOLLHUP ) 
-				{
-					close(event_buffer[i].data.fd);
 					continue;
-				}
 				else if (std::find(_serverSockets.begin(), _serverSockets.end(), client_socket) != _serverSockets.end()) 
 				{
 					struct sockaddr_in client_address;
@@ -433,7 +430,7 @@ void	Cluster::startServers()
 					catch (std::exception &e) 
 					{
 						_fdMap[client_socket]->closeConnections(client_socket, epoll_fd, event_buffer, _fdMap, _activityTime);
-						std::cerr << e.what() << std::endl;
+						std::cout << e.what() << std::endl;
 					}
 					// If checkTimeout closes a fd then go back to the beginning, so as not to iterate over possible removed FDs from buffer
 					if (checkTimeout(epoll_fd, event_buffer) > 0)
@@ -444,7 +441,7 @@ void	Cluster::startServers()
 	} 
 	catch (const std::exception &e) 
 	{
-		std::cerr << e.what() << std::endl;
+		std::cout << e.what() << std::endl;
 		clearServer();
 	}
 }
@@ -487,14 +484,13 @@ void	Cluster::connectionHandler(int fd, Server* server)
  */
 void Cluster::promptInfo() 
 {
-    std::cout << BOLD << RED << "─────────────────────────────────────────────────────────────────────────" << std::endl;
-    std::cout << "| " << RESET << BOLD << std::setw(20) << "Timestamp" << " | " 
-              << RESET << BOLD << std::setw(16) << "Server Name" << " | " 
-              << RESET << BOLD << std::setw(13) << "Address" << " | " 
-              << RESET << BOLD << std::setw(10) << "Port" << " |" << std::endl;
-    std::cout << RED << "─────────────────────────────────────────────────────────────────────────" << RESET << std::endl;
-	std::map<int, Server*>::iterator	it = _fdMap.begin();
-    for (; it != _fdMap.end(); ++it) 
+	std::string colors[] = {MAGENTA, BLUE, YELLOW, CYAN};
+	int numColors = sizeof(colors) / sizeof(colors[0]);
+	int i = 0;
+	std::cout << std::endl;
+    std::cout << BOLD_RED << "  " << "Server Name" << std::setw(16) << "Address" << std::setw(21) << "Port" << std::endl << std::endl;
+	std::map<int, Server*>::iterator it = _fdMap.begin();
+    for (; it != _fdMap.end(); ++it, ++i)
 	{
 		Server* server = it->second;
         std::time_t timestamp = std::time(NULL);
@@ -503,12 +499,8 @@ void Cluster::promptInfo()
 		std::string serverName = server->getConf().server_name.back();
 		std::string address = ipToStr(server->getListen().host);
 		int port = server->getListen().port;
-		std::cout << BOLD_RED << "| " << GREEN << std::setw(20) << buff << BOLD_RED << " | " 
-				<< YELLOW << std::setw(16) << serverName << BOLD_RED << " | " 
-				<< YELLOW << std::setw(13) << address << BOLD_RED << " | " 
-				<< YELLOW << std::setw(10) << port << BOLD_RED << " |" << RESET << std::endl;
+		std::cout << BOLD << colors[i % numColors] << " * " << serverName << " \u27F9 " << " " << std::setw(16) << address << ": " << port << std::setw(21) << "created @ " << buff << RESET << std::endl;
     }
-    std::cout << BOLD << BOLD_RED << "─────────────────────────────────────────────────────────────────────────" << RESET << std::endl;
 }
 
 /* ===================== Exceptions ===================== */

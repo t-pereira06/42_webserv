@@ -10,13 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-// #include "headers/config/confParser.hpp"
-// #include "headers/server/Cluster.hpp"
 #include "./headers/webserv.hpp"
 #include "./headers/server/Server.hpp"
 #include "./headers/server/Cluster.hpp"
 
-//Cluster* GlobalServerPtr = NULL;
 volatile sig_atomic_t gSignalStatus = 0;
 Cluster* gServerCluster = NULL;
 bool chunky = false;
@@ -29,13 +26,12 @@ bool chunky = false;
  */
 extern "C" void	signalHandler(int signum) 
 {
-
+	std::cout << std::endl;
     if (gServerCluster) 
     {
         std::vector<Server*>::const_iterator it;
         for (it = gServerCluster->getServers().begin(); it != gServerCluster->getServers().end(); ++it)
             close((*it)->getFD());
-       // gServerCluster->clearServer();
     }
     (void)signum;
 	gSignalStatus = 1;
@@ -47,17 +43,17 @@ extern "C" void	signalHandler(int signum)
 
     for (int j = 0; j < 24; ++j)
     {
-        std::cout << BOLD_BLUE << loadingIcons[j % numIcons] << RESET;
+        std::cout << RESET << RED << loadingIcons[j % numIcons] << RESET;
         std::cout.flush();
-        usleep(100000); // Sleep for 100 milliseconds (adjust as needed)
+        usleep(40000);
     }
+	usleep(400000);
     std::cout << "\r" << BOLD_GREEN << "Finished \u2713" << RESET;
-	usleep(200000);
-    std::cout << "                                   \n"; // Clear the rest of the line
+    std::cout << "                                   \n";
     std::cout << std::endl;
 }
 
-void printIntro(char **envp)
+void promptIntro(char **envp)
 {
 	pid_t pid = fork();
 	if (pid == 0)
@@ -87,16 +83,20 @@ void printIntro(char **envp)
 	usleep(497000);
 	std::cout << "    ░         ░  ░   ░              ░       ░  ░     ░             ░  \n";
 	usleep(597000);
+	std::cout << "  ░            ░  ░   ░    ░                  ░        ░           ░    \n";
+	std::cout << std::endl;
 	std::cout << "                       ░                                 ░" << RESET << std::endl;
+	std::cout << std::endl;
+	std::cout << std::endl;
 }
 
 int		main(int ac, char **av, char **envp)
 {
-    printIntro(envp);
+    promptIntro(envp);
     std::string filename;
     signal(SIGPIPE, SIG_IGN);
     if (ac != 2)
-        std::cerr << "Run the program with a configuration file: ./webserv [configuration file]" << std::endl;
+        std::cout << RED << "Error: " << RESET << "Usage: ./webserv [configuration file]" << std::endl;
     else
 	{
         signal(SIGINT, signalHandler);

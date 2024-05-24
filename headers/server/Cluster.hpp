@@ -51,16 +51,16 @@ class	Cluster
 		void	promptInfo();
 		void	clearServer();
 		int	 	checkTimeout(int epoll_fd, struct epoll_event* event_buffer);
-		void	callerSemicolon(Server* server);
-		void	callerDoubles(Server *server);
-		void	callerServerName(Server* server);
-		void	callerListen(std::string& wordStack, t_listen& listen);
-		void	callerServerRoot(Server* server);
-		void	callerErrorPage(Server* server);
-		void	callerIndex(Server* server);
-		void	callerMethods(Server* server);
-		void	callerClientSize(Server* server);
-		void	callerLocations(Server* server);
+		void	processSemicolon(Server* server);
+		void	processDoubles(Server *server);
+		void	processServerName(Server* server);
+		void	processListen(std::string& wordStack, t_listen& listen);
+		void	processServerRoot(Server* server);
+		void	processErrorPage(Server* server);
+		void	processIndex(Server* server);
+		void	processMethods(Server* server);
+		void	processClientSize(Server* server);
+		void	processLocations(Server* server);
 		void	startServers();
 		void	connectionHandler(int fd, Server* server);
 

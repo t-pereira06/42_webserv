@@ -350,7 +350,7 @@ int	Response::generateDirListing(Server* server, int fd, std::string location)
 
 	// Remove the temp file
 	if (std::remove(path.c_str()) != 0) 
-        std::cerr << "Error: Unable to delete file " << path << std::endl;
+        std::cout << "Error: Unable to delete file " << path << std::endl;
 	return (nFiles);
 }
 

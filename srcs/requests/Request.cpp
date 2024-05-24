@@ -296,6 +296,7 @@ std::string Request::bodyParser()
 {
 	if (!chunky)
 	{
+		bool final = false;
 		std::string finalBoundary = "--" + _boundary + "--";
 		std::string body;
 		std::string marker = "Content-Disposition:";
@@ -305,17 +306,16 @@ std::string Request::bodyParser()
 		startPos = _fullRequest.find("\r\n\r\n", startPos);
 		if (startPos == std::string::npos)
 		{
-			std::cerr << "Start of content not found." << std::endl;
+			std::cout << "Start of content not found." << std::endl;
 			return "";
 		}
 		startPos += 4;
 		std::string::size_type endPos = _fullRequest.find(finalBoundary, startPos);
 		if (endPos == std::string::npos)
-		{
-			std::cerr << "Final boundary marker not found." << std::endl;
-			return "";
-    	}
+			final = true;
 		body = _fullRequest.substr(startPos, endPos - startPos);
+		if (final)
+			body.append(finalBoundary);
 		return body;
 	}
 	else
@@ -493,7 +493,7 @@ int	Request::ConfigureRequest(Server* server)
 	}
 	catch (std::exception &e)
 	{
-		std::cerr << "Cant Parse Request" << std::endl;
+		std::cout << "Cant Parse Request" << std::endl;
 	}
 	return (200);
 }
