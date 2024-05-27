@@ -787,6 +787,10 @@ void	Server::executePost(Request& req)
         return;
     }
     // Write new data to the file
+	std::time_t timestamp = std::time(NULL);
+    char buff[50];
+    std::strftime(buff, sizeof(buff), "%Y-%m-%d %H:%M:%S", std::localtime(&timestamp));
+	file << buff << ": ";
     file << req.getBody();
 	file << "───────────────── // ─────────────────" << std::endl;
     file.close();

@@ -468,7 +468,6 @@ public:
  */
 void	Cluster::connectionHandler(int fd, Server* server) 
 {
-	std::cout << "fd is: " << fd << std::endl;
 	_activityTime[fd] = time(NULL);
 	if (std::find_if(server->getConnectionVector().begin(), server->getConnectionVector().end(), MatchFd(fd)) == server->getConnectionVector().end())
 		server->setConnection(fd);
@@ -489,7 +488,7 @@ void Cluster::promptInfo()
 	int numColors = sizeof(colors) / sizeof(colors[0]);
 	int i = 0;
 	std::cout << std::endl;
-    std::cout << BOLD_RED << "  " << "Server Name" << std::setw(16) << "Address" << std::setw(21) << "Port" << std::endl << std::endl;
+    std::cout << BOLD_RED << "  " << "Server Name      " << " Address : Port" << std::endl << std::endl;
 	std::map<int, Server*>::iterator it = _fdMap.begin();
     for (; it != _fdMap.end(); ++it, ++i)
 	{
