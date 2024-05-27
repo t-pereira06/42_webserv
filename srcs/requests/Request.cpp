@@ -72,12 +72,12 @@ Request::~Request()
 
 int		Request::fillHeader(int socket)
 {
-	char buffer[500];
+	char buffer[1024];
 	bool firstLine = false;
 	while(1)
 	{
-		bzero(buffer, 500);
-		ssize_t bytesRead = recv(socket, buffer, sizeof(buffer) - 1, MSG_DONTWAIT);
+		//bzero(buffer, 1024);
+		ssize_t bytesRead = recv(socket, buffer, sizeof(buffer) - 1, MSG_NOSIGNAL);
 		if (bytesRead <= 0)
 			break;
 		buffer[bytesRead] = 0;
