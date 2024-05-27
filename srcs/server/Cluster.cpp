@@ -468,6 +468,7 @@ public:
  */
 void	Cluster::connectionHandler(int fd, Server* server) 
 {
+	std::cout << "fd is: " << fd << std::endl;
 	_activityTime[fd] = time(NULL);
 	if (std::find_if(server->getConnectionVector().begin(), server->getConnectionVector().end(), MatchFd(fd)) == server->getConnectionVector().end())
 		server->setConnection(fd);
