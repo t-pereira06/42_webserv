@@ -565,8 +565,23 @@ void Server::executeDeleteCGIScript(const std::string& scriptPath, Request& req,
         std::cout << "Failed to fork." << std::endl;
     } else if (pid > 0) 
 	{
+        const int timeout = 5;
+        time_t start = time(NULL);
         int status;
-        waitpid(pid, &status, 0);
+        while (1) {
+            pid_t result = waitpid(pid, &status, WNOHANG);
+            if (result == -1)
+                break ;
+            else if (result == 0) {
+                time_t currentTime = time(NULL);
+                if (difftime(currentTime, start) >= timeout) {
+                    kill(pid, SIGKILL);
+                    waitpid(pid, &status, 0);
+                    break;
+                }
+            }
+            usleep(100000);
+        }
         if (WIFEXITED(status) ) 
 		{
 			resp.sendResponse(this, fd, "./var/www/html/form/delete.html", 202);
@@ -645,10 +660,24 @@ void Server::executeUploadCGIScript(const std::string& scriptPath, Request& req,
 		const std::string& postData = req.getBody(); // Check if getReqBody() actually retrieves raw binary data correctly
 		write(toChild[1], postData.data(), postData.size());
 		close(toChild[1]); // Close the write end to signal EOF to the child
-
 		int reqCode;
-		// Parent waits for the child process to terminate
-		waitpid(pid, NULL, 0);
+		const int timeout = 5;
+        time_t start = time(NULL);
+        int status;
+        while (1) {
+            pid_t result = waitpid(pid, &status, WNOHANG);
+            if (result == -1)
+                break ;
+            else if (result == 0) {
+                time_t currentTime = time(NULL);
+                if (difftime(currentTime, start) >= timeout) {
+                    kill(pid, SIGKILL);
+                    waitpid(pid, &status, 0);
+                    break;
+                }
+            }
+            usleep(100000);
+        }
 
 		if (req.getFilename().empty())
 			// Empty Media
@@ -751,8 +780,23 @@ void	Server::executeCGIScript(const std::string& scriptPath, Request& req, int f
 		close(toChild[1]); // Close the write end to signal EOF to the child
 
 
-		// Parent waits for the child process to terminate
-		waitpid(pid, NULL, 0);
+		const int timeout = 5;
+        time_t start = time(NULL);
+        int status;
+        while (1) {
+            pid_t result = waitpid(pid, &status, WNOHANG);
+            if (result == -1)
+                break ;
+            else if (result == 0) {
+                time_t currentTime = time(NULL);
+                if (difftime(currentTime, start) >= timeout) {
+                    kill(pid, SIGKILL);
+                    waitpid(pid, &status, 0);
+                    break;
+                }
+            }
+            usleep(100000);
+        }
 		resp.sendResponseCGI(toParent[0], toParent[1], fd);
 	}
 }
@@ -839,15 +883,17 @@ int	Server::sender(int socket)
 	if (req._isRequestComplete)
 		return (0);
 	resp.defaultFlags();
-	if (req.fillHeader(fd)) 
+	if (req.fillHeader(fd) != -1) 
 	{
 		if (req._isRequestComplete) 
 		{
 			reqCode = 200;
 			resp.sendResponse(this, fd, resp.getErrorPage(reqCode, getConf()), reqCode);
+			//return (0);
 		}
-		return (0);
 	}
+	else
+		return -1;
 	// Check request size
 	reqCode = req.checkClientBodySize(this);
 	if (reqCode != 413) 
@@ -855,6 +901,7 @@ int	Server::sender(int socket)
 		// Parse the request URI, METHOD and HTTP VERSION. Returns appropriate response codes
 		reqCode = req.ConfigureRequest(this);
 		std::string host(req.getHost());
+		std::cout << "host is: " << host << std::endl;
 		std::size_t pos = host.find(':');
 		if (pos != std::string::npos)
 			host = host.substr(0, pos);
