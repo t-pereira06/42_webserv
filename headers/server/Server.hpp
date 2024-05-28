@@ -95,7 +95,7 @@ class Server
 		void	executeDeleteFile();
 		void	executeDeleteCGIScript(const std::string& scriptPath, Request& req, int fd, Response &resp);
 		void	executeUploadCGIScript(const std::string& scriptPath, Request& req, int fd, Response &resp);
-		void	executeCGIScript(const std::string& scriptPath, Request& req, int fd, Response &resp);
+		int		executeCGIScript(const std::string& scriptPath, Request& req, int fd, Response &resp);
 		int		bracketChecker();
 		int		bodyFiller(std::istringstream& iss);
 
