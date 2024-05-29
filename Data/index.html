@@ -1,21 +1,116 @@
-<html>
-  <head>
-    <link rel="stylesheet" type="text/css" href="css/netpractice.css">
-    <script src="js/intro.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
-  </head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>42 Presentation</title>
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff; /* White background */
+        }
 
-  <body>
-    <div class='intro_div'>
-      Welcome to 42's NetPractice !<br />
-      Please enter your intranet login (the moulinette will use it to know your own configuration) : <br />
-      <input id='input_login' type=text size=8><br />
-      Or leave empty for a defense : 3 random level from 6 to 10 will be offered to be solved in 15 minutes.<br />
-      <span class='footnote'>Note: the architecture and addresses used in the following levels are fictionnous and are not connected to real configurations.</span><br />
-      <input type=button value="Start !" onclick='save_login();'>
-    </div>
-    <script>document.getElementById('input_login').value = load_login();</script>
-  </body>
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+        }
+
+        nav {
+            background-color: #444;
+            color: #fff;
+            padding: 15px 0;
+            text-align: center;
+            display: flex; /* Align items in a row */
+            justify-content: space-between; /* Distribute items with space between them */
+        }
+
+        nav a {
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 600;
+            color: #fff;
+            text-decoration: none;
+            padding: 0 15px;
+        }
+
+        nav a:hover {
+            color: #020202;
+        }
+
+        .login-link {
+            color: #fff;
+            text-decoration: none;
+            padding: 0 10px;
+            margin-right: 10px; /* Add margin to separate from other links */
+        }
+
+        section {
+            padding: 20px;
+            margin: 20px;
+            background-color: #fff; /* White background */
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Adding a slight shadow */
+        }
+
+        footer {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .image{
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            width: 55%;
+        }
+
+        .image-logo{
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            width: 5%;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a class="nav__link" href="/">
+        <img src="images/42_logo_white.png" alt="42Logo" class="image-logo">
+      </a>
+</header>
+
+<nav>
+    <div>
+    <a class="nav__link" href="/">Home</a>
+    <a class="nav__link" href="/schools/schools.html">Escolas</a>
+    <a class="nav__link" href="/form/form.html">Upload</a>
+    <a class="nav__link" href="/form/delete.html">Delete</a>
+    <a class="nav__link" href="/form/comments.html">Comments</a>
+</div>
+<div>
+    <a href="/login/login.html" class="login-link">Login</a>
+</div>
+</nav>
+
+<section>
+    <h2>O que é a escola 42?</h2>
+    <p>A 42 é uma das melhores escolas de programação do mundo, com mais de 18.000 alunos em mais de 30 países.</p>
+
+    <p>Este website dá a conhecer algumas das escolas 42 espalhadas pelo mundo!</p>
+
+    <img src="images/42schools.png" alt="42Logo" class="image">
+</section>
+
+</body>
 </html>
-
 

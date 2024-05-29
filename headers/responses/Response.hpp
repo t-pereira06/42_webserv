@@ -46,9 +46,9 @@ class Response
 		const std::string 			findRoot(Server* server, const std::string& uri);
 		LocationDir*				getDir(Server* server, const std::string& name);
 		std::string					selectIndexFile(Server* server, int fd, const std::vector<std::string> indexVector, size_t size, const std::string& root, const std::string& uri, bool autoindex, const std::string& possibleIndex);
-		void						sendResponse(Server* server, int fd, std::string file, int code);
+		int							sendResponse(Server* server, int fd, std::string file, int code);
 		int							generateDirListing(Server* server, int fd, std::string location);
-		void						sendResponseCGI(int read_fd, int write_fd, int clientSocket);
+		int							sendResponseCGI(int read_fd, int write_fd, int clientSocket);
 		class ResponseException : public std::exception
 		{
 			private:

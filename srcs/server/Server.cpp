@@ -16,12 +16,12 @@ std::string gfullRequest;
 
 Server::Server() {}
 
-Server::Server(const Server& original) 
+Server::Server(const Server& original)
 {
 	(void)original;
 }
 
-Server& Server::operator=(const Server& original) 
+Server& Server::operator=(const Server& original)
 {
 	(void)original;
 	return (*this);
@@ -31,7 +31,7 @@ Server::~Server() {}
 
 /* ===================== Constructors ===================== */
 
-Server::Server(const t_listen& listen) 
+Server::Server(const t_listen& listen)
 {
 	_listen.port = listen.port;
 	_listen.host = listen.host;
@@ -47,20 +47,20 @@ Server::Server(const t_listen& listen)
 
 /* ===================== Getter Functions ===================== */
 
-long Server::getFD() 
+long Server::getFD()
 {
 	return _socketfd;
 }
 
-std::vector<Connection>&	Server::getOpenConnections() 
+std::vector<Connection>&	Server::getOpenConnections()
 {
 	return (_connectionsVector);
 }
 
-Connection&		Server::getConnection(int toFind) 
+Connection&		Server::getConnection(int toFind)
 {
 	std::vector<Connection>::iterator it;
-	for (it = _connectionsVector.begin(); it != _connectionsVector.end(); ++it) 
+	for (it = _connectionsVector.begin(); it != _connectionsVector.end(); ++it)
 	{
 		if (it->getConnectionFD() == toFind)
 			break ;
@@ -68,62 +68,62 @@ Connection&		Server::getConnection(int toFind)
 	return (*it);
 }
 
-std::vector<Connection>& Server::getConnectionVector() 
+std::vector<Connection>& Server::getConnectionVector()
 {
 	return (_connectionsVector);
 }
 
-const std::vector<std::string>& Server::getBody() const 
+const std::vector<std::string>& Server::getBody() const
 {
 	return (_body);
 }
 
-std::vector<std::string>& Server::getDynamicBody() 
+std::vector<std::string>& Server::getDynamicBody()
 {
 	return (_body);
 }
 
-const t_server_config&	Server::getConf() const 
+const t_server_config&	Server::getConf() const
 {
 	return (_serverConfig);
 }
 
-t_server_config&	Server::getDynamicConfig() 
+t_server_config&	Server::getDynamicConfig()
 {
 	return (_serverConfig);
 }
 
-const t_listen&	Server::getListen() const 
+const t_listen&	Server::getListen() const
 {
 	return (_listen);
 }
 
-t_listen&	Server::getDynamicListen() 
+t_listen&	Server::getDynamicListen()
 {
 	return (_listen);
 }
 
-sockaddr_in*	Server::getSockaddr() 
+sockaddr_in*	Server::getSockaddr()
 {
 	return (&_sockaddr);
 }
 
-bool	Server::getServerStatus() const 
+bool	Server::getServerStatus() const
 {
 	return (_isServerOn);
 }
 
-bool	Server::isGETAllowed() const 
+bool	Server::isGETAllowed() const
 {
 	return (_GETAllowed);
 }
 
-bool	Server::isPOSTAllowed() const 
+bool	Server::isPOSTAllowed() const
 {
 	return (_POSTAllowed);
 }
 
-bool	Server::isDELETEAllowed() const 
+bool	Server::isDELETEAllowed() const
 {
 	return (_DELETEAllowed);
 }
@@ -137,7 +137,7 @@ bool	Server::isDELETEAllowed() const
  *
  * @param fd The file descriptor to set.
  */
-void	Server::setFD(long fd) 
+void	Server::setFD(long fd)
 {
 	_socketfd = fd;
 }
@@ -148,7 +148,7 @@ void	Server::setFD(long fd)
  * This function configures the address family, port, and IP address of the server.
  * It initializes the sockaddr_in structure with the appropriate values.
  */
-void	Server::setAddr() 
+void	Server::setAddr()
 {
 	_sockaddr.sin_family = AF_INET; // Identifier for sockaddr_in by default
 	_sockaddr.sin_port = htons(_listen.port);   // listen for t_listen _listen.port //
@@ -163,7 +163,7 @@ void	Server::setAddr()
  *
  * @param connection The connection descriptor to set.
  */
-void	Server::setConnection(int connection) 
+void	Server::setConnection(int connection)
 {
 	_connectionsVector.push_back(Connection(connection));
 }
@@ -178,7 +178,7 @@ void	Server::setConnection(int connection)
  * Additionally, it initializes the server's allowed HTTP methods based on the server configuration.
  * If any step fails, it throws a ServerException with an appropriate error message.
  */
-void Server::initServer() 
+void Server::initServer()
 {
 
 	std::ostringstream errorMsg;
@@ -216,7 +216,7 @@ void Server::initServer()
  *
  * @param socket The socket descriptor to set to non-blocking mode.
  */
-void Server::setNonBlock(int socket) 
+void Server::setNonBlock(int socket)
 {
 
 	// Set the modified socket flags
@@ -238,24 +238,24 @@ void Server::setNonBlock(int socket)
  * @param req The request object.
  * @param resp The response object.
  */
-void	Server::deleteCGI(const std::string& uri, int fd, Request& req, Response& resp) 
+void	Server::deleteCGI(const std::string& uri, int fd, Request& req, Response& resp)
 {
 
 	if(req.getMethod() == "DELETE")
 	{
 		std::vector<BaseLocation*>::iterator it = _serverConfig.locationStruct.begin();
-		for (; it != _serverConfig.locationStruct.end(); ++it) 
+		for (; it != _serverConfig.locationStruct.end(); ++it)
 		{
 			LocationFiles* file = dynamic_cast<LocationFiles*>(*it);
 			// Get the uri extension for the cgi file
 			size_t extPos = uri.rfind(".");
 			std::string fileExt;
-			if (extPos != std::string::npos) 
+			if (extPos != std::string::npos)
 			{
 				fileExt = uri.substr(extPos, uri.length() - 1);
 
 				// Check if the file is the same type as uri
-				if (file && (file->name.find(fileExt) != std::string::npos)) 
+				if (file && (file->name.find(fileExt) != std::string::npos))
 				{
 					executeDeleteCGIScript("." + file->cgi_pass, req, fd, resp);
 					_isCGI = true;
@@ -281,14 +281,14 @@ void	Server::deleteCGI(const std::string& uri, int fd, Request& req, Response& r
  * @param reqCode Reference to the request code.
  * @return An integer representing the status code.
  */
-int	Server::postCGI(const std::string& uri, int fd, Request& req, Response& resp, int& reqCode) 
+int	Server::postCGI(const std::string& uri, int fd, Request& req, Response& resp, int& reqCode)
 {
 	// Checking if request is POST
 	if (req.getMethod() == "POST")
 	{
-		if (req.getFilename() == "") 
+		if (req.getFilename() == "")
 		{
-			if (req.getContentLen() == "0" || req.getBody().size() == 2) 
+			if (req.getContentLen() == "0" || req.getBody().size() == 2)
 			{
 				reqCode = 204;
 				return (reqCode);
@@ -298,16 +298,16 @@ int	Server::postCGI(const std::string& uri, int fd, Request& req, Response& resp
 		}
 		std::string contentlen(req.getHeader("Content-Length"));
 		envCGI(_serverConfig, uri, _envp, req);
-		if (std::atoi(contentlen.c_str()) == 0) 
+		if (std::atoi(contentlen.c_str()) == 0)
 		{
 			std::cout << "No content was sent" << std::endl;
 			reqCode = 204;
 		}
-		else 
+		else
 		{
 			// Checking if the location is a file on root
 			std::vector<BaseLocation *>::iterator it = _serverConfig.locationStruct.begin();
-			for (; it != _serverConfig.locationStruct.end(); ++it) 
+			for (; it != _serverConfig.locationStruct.end(); ++it)
 			{
 				LocationFiles *file = dynamic_cast<LocationFiles *>(*it);
 
@@ -319,12 +319,13 @@ int	Server::postCGI(const std::string& uri, int fd, Request& req, Response& resp
 				else
 					break;
 				// Check if the file is the same type as uri
-				if (file && (file->name.find(fileExt) != std::string::npos) && file->cgi_pass.find(uri) != std::string::npos) 
+				if (file && (file->name.find(fileExt) != std::string::npos) && file->cgi_pass.find(uri) != std::string::npos)
 				{
 					std::string method = _envp.request_method.substr(_envp.request_method.find_first_of('=') + 1);
-					if (std::find(file->allow_methods.begin(), file->allow_methods.end(), method) != file->allow_methods.end()) 
+					if (std::find(file->allow_methods.begin(), file->allow_methods.end(), method) != file->allow_methods.end())
 					{
-						executeCGIScript("." + file->cgi_pass, req, fd,	resp);
+						if(executeCGIScript("." + file->cgi_pass, req, fd,	resp) < 0)
+							return -1;
 						_isCGI = true;
 						return 0;
 					}
@@ -332,12 +333,12 @@ int	Server::postCGI(const std::string& uri, int fd, Request& req, Response& resp
 				}
 
 				// If it's not on root level, check every subdirectory location level to see if the file is inside it
-				else 
+				else
 				{
 					LocationDir *dir = dynamic_cast<LocationDir *>(*it);
 					if (dir) {
 						std::vector<LocationFiles *>::iterator file_it = dir->files.begin();
-						for (; file_it != dir->files.end(); ++file_it) 
+						for (; file_it != dir->files.end(); ++file_it)
 						{
 							LocationFiles *file = *file_it;
 
@@ -349,13 +350,14 @@ int	Server::postCGI(const std::string& uri, int fd, Request& req, Response& resp
 								break;
 
 							// Check if the file is the same type as uri
-							if (file && (file->name.find(fileExt) != std::string::npos) && file->cgi_pass.find(uri) != std::string::npos) 
+							if (file && (file->name.find(fileExt) != std::string::npos) && file->cgi_pass.find(uri) != std::string::npos)
 							{
 								size_t posss = _envp.request_method.find_first_of('=') + 1;
 								std::string method = _envp.request_method.substr(posss);
-								if (std::find(file->allow_methods.begin(), file->allow_methods.end(), method) != file->allow_methods.end()) 
+								if (std::find(file->allow_methods.begin(), file->allow_methods.end(), method) != file->allow_methods.end())
 								{
-									executeCGIScript("." + file->cgi_pass, req, fd,	resp);
+									if(executeCGIScript("." + file->cgi_pass, req, fd,	resp) < 0)
+										return -1;
 									_isCGI = true;
 									return 0;
 								}
@@ -383,12 +385,12 @@ int	Server::postCGI(const std::string& uri, int fd, Request& req, Response& resp
  * @param resp The response object.
  * @return An integer representing the status code.
  */
-int Server::getCGI(const std::string& uri, int fd, Request& req, Response& resp) 
+int Server::getCGI(const std::string& uri, int fd, Request& req, Response& resp)
 {
 
 	// Finding Query Delimiter
 	size_t QueryDelim = uri.find("?");
-	if (QueryDelim != std::string::npos && (uri.find_first_of('?') == uri.find_last_of('?'))) 
+	if (QueryDelim != std::string::npos && (uri.find_first_of('?') == uri.find_last_of('?')))
 	{
 		_envp.content_length = "CONTENT_LENGTH=" + req.getContentLen();
 		_envp.content_type = "CONTENT_TYPE=" + req.getContentType();
@@ -397,7 +399,7 @@ int Server::getCGI(const std::string& uri, int fd, Request& req, Response& resp)
 		//PATH INFO
 		size_t pos = uri.find(".py");
 		std::string script;
-		if (pos != std::string::npos && pos < QueryDelim) 
+		if (pos != std::string::npos && pos < QueryDelim)
 		{
 			pos += 3;
 			script = "." + uri.substr(0, pos);
@@ -405,7 +407,7 @@ int Server::getCGI(const std::string& uri, int fd, Request& req, Response& resp)
 		else
 			return 404;
 		DIR* dir = opendir(script.c_str());
-		while (dir != NULL) 
+		while (dir != NULL)
 		{
 			closedir(dir);
 			size_t new_pos = uri.find(".py", pos) + 3;
@@ -421,13 +423,13 @@ int Server::getCGI(const std::string& uri, int fd, Request& req, Response& resp)
 			return 404;
 		script.erase(0, 1);
 		pos = uri.find(script);
-		if (pos != std::string::npos) 
+		if (pos != std::string::npos)
 		{
 			std::string aux(uri);
 			aux.erase(QueryDelim);
 			_envp.path_info = "PATH_INFO=" + aux.substr(pos + script.length());
 			pos = _envp.script_name.rfind('/');
-			if (pos != std::string::npos) 
+			if (pos != std::string::npos)
 			{
 				_envp.path_translated = "PATH_TRANSLATED=" + _envp.script_name.substr(_envp.script_name.find_first_of('=') + 1, _envp.script_name.length() - _envp.script_name.rfind('/'));
 				_envp.path_translated = _envp.path_translated + _envp.path_info.substr(_envp.path_info.find_first_of('=') + 1);
@@ -448,18 +450,18 @@ int Server::getCGI(const std::string& uri, int fd, Request& req, Response& resp)
 		script = _envp.script_name.substr(pos);
 
 		pos = script.find(".py");
-		if (pos != std::string::npos) 
+		if (pos != std::string::npos)
 		{
 			std::string fileExt = script.substr(pos);
 			std::vector<BaseLocation *>::iterator it = _serverConfig.locationStruct.begin();
-			for (; it != _serverConfig.locationStruct.end(); ++it) 
+			for (; it != _serverConfig.locationStruct.end(); ++it)
 			{
 				LocationFiles *file = dynamic_cast<LocationFiles *>(*it);
 
 				// Check if the file is the same type as uri
-				if (file && (file->name.find(fileExt) != std::string::npos) && file->cgi_pass.find(script) != std::string::npos) 
+				if (file && (file->name.find(fileExt) != std::string::npos) && file->cgi_pass.find(script) != std::string::npos)
 				{
-					if (std::find(file->allow_methods.begin(), file->allow_methods.end(), _envp.request_method.substr(_envp.request_method.find_first_of('=') + 1)) != file->allow_methods.end()) 
+					if (std::find(file->allow_methods.begin(), file->allow_methods.end(), _envp.request_method.substr(_envp.request_method.find_first_of('=') + 1)) != file->allow_methods.end())
 					{
 						executeCGIScript("./cgi-bin" + script, req, fd, resp);
 						_isCGI = true;
@@ -469,20 +471,20 @@ int Server::getCGI(const std::string& uri, int fd, Request& req, Response& resp)
 				}
 
 				// If it's not on root level, check every subdirectory location level to see if the file is inside it
-				else 
+				else
 				{
 					LocationDir *dir = dynamic_cast<LocationDir *>(*it);
-					if (dir) 
+					if (dir)
 					{
 						std::vector<LocationFiles *>::iterator file_it = dir->files.begin();
-						for (; file_it != dir->files.end(); ++file_it) 
+						for (; file_it != dir->files.end(); ++file_it)
 						{
 							LocationFiles *file = *file_it;
 
 							// Check if the file is the same type as uri
-							if (file && (file->name.find(fileExt) != std::string::npos) && file->cgi_pass.find(script) != std::string::npos) 
+							if (file && (file->name.find(fileExt) != std::string::npos) && file->cgi_pass.find(script) != std::string::npos)
 							{
-								if (std::find(file->allow_methods.begin(), file->allow_methods.end(), _envp.request_method.substr(_envp.request_method.find_first_of('=') + 1)) != file->allow_methods.end()) 
+								if (std::find(file->allow_methods.begin(), file->allow_methods.end(), _envp.request_method.substr(_envp.request_method.find_first_of('=') + 1)) != file->allow_methods.end())
 								{
 									executeCGIScript("./cgi-bin" + script, req, fd, resp);
 									_isCGI = true;
@@ -513,7 +515,7 @@ int Server::getCGI(const std::string& uri, int fd, Request& req, Response& resp)
  * @param reqCode Reference to the request code.
  * @return An integer representing the status code.
  */
-int Server::CGI(const std::string& uri, int fd, Request& req, Response& resp, int& reqCode) 
+int Server::CGI(const std::string& uri, int fd, Request& req, Response& resp, int& reqCode)
 {
 	int cgi = 0;
 
@@ -521,6 +523,8 @@ int Server::CGI(const std::string& uri, int fd, Request& req, Response& resp, in
 	if (_isCGI)
 		return 0;
 	cgi = postCGI(uri, fd, req, resp, reqCode);
+	if(cgi < 0)
+		return -1;
 	if (_isCGI)
 		return 0;
 	else if (cgi == 405)
@@ -560,10 +564,10 @@ void Server::executeDeleteCGIScript(const std::string& scriptPath, Request& req,
 		resp.sendResponse(this, fd, resp.getErrorPage(reqCode, getConf()), reqCode);
 	}
 	pid_t pid = fork();  // Create a new process
-    if (pid == -1) 
+    if (pid == -1)
 	{
         std::cout << "Failed to fork." << std::endl;
-    } else if (pid > 0) 
+    } else if (pid > 0)
 	{
         const int timeout = 5;
         time_t start = time(NULL);
@@ -582,18 +586,18 @@ void Server::executeDeleteCGIScript(const std::string& scriptPath, Request& req,
             }
             usleep(100000);
         }
-        if (WIFEXITED(status) ) 
+        if (WIFEXITED(status) )
 		{
 			resp.sendResponse(this, fd, "./var/www/html/form/delete.html", 202);
 			return;
         }
-    } 
-	else 
+    }
+	else
 	{
 		std::string filename = req.trimValue("File-Name");
 		std::string filenameEnv = "FILENAME=" + filename;
 		char *argv[] = {const_cast<char*> ("php-cgi"), (char *)scriptPath.c_str(), NULL};
-		char* envp[] = {const_cast<char*>(filenameEnv.c_str()), NULL}; 
+		char* envp[] = {const_cast<char*>(filenameEnv.c_str()), NULL};
 		dup2(fd, STDOUT_FILENO);
 		close(fd);
 		if (execve("/usr/bin/php-cgi", argv, envp) == -1)
@@ -686,7 +690,7 @@ void Server::executeUploadCGIScript(const std::string& scriptPath, Request& req,
 			std::string filepath = "./Data/" + req.getFilename();
 
 			struct stat buffer;
-			if (stat(filepath.c_str(), &buffer) == 0) 
+			if (stat(filepath.c_str(), &buffer) == 0)
 			{
 				// Accepted upload
 				resp.sendResponse(this, fd, "./var/www/html/form/upload.html", 202);
@@ -717,18 +721,19 @@ void Server::executeUploadCGIScript(const std::string& scriptPath, Request& req,
  * @param resp The response object.
  */
 
-void	Server::executeCGIScript(const std::string& scriptPath, Request& req, int fd, Response& resp) 
+int	Server::executeCGIScript(const std::string& scriptPath, Request& req, int fd, Response& resp)
 {
-	if (scriptPath.find("upload.py") != std::string::npos) 
+	if (scriptPath.find("upload.py") != std::string::npos)
 	{
 		executeUploadCGIScript(scriptPath, req, fd, resp);
-		return ;
+		return 0;
 	}
 
-	if (scriptPath.find("chunker") != std::string::npos) 
+	if (scriptPath.find("chunker") != std::string::npos)
 	{
-		resp.sendResponse(this, fd, resp.getErrorPage(411, getConf()), 411);
-		return ;
+		if(resp.sendResponse(this, fd, resp.getErrorPage(411, getConf()), 411) < 0)
+			return -1;
+		return 0;
 	}
 
 	//Here we create two pipes, to allow communication between parent-child and child-parent
@@ -797,15 +802,17 @@ void	Server::executeCGIScript(const std::string& scriptPath, Request& req, int f
             }
             usleep(100000);
         }
-		resp.sendResponseCGI(toParent[0], toParent[1], fd);
+		if(resp.sendResponseCGI(toParent[0], toParent[1], fd) < 0)
+			return -1;
 	}
+	return 0;
 }
 
 /* ===================== Non-CGI POST and DELETE Functions ===================== */
 
 /**
  * @brief Appends new commentDB to the "commentDB.txt" file.
- * 
+ *
  * This function reads the request body containing new comments and appends them to the "commentDB.txt" file.
  * If the file doesn't exist, it creates one. Each new comment is separated by a delimiter.
  *
@@ -817,7 +824,7 @@ void	Server::executePost(Request& req)
 	if(!infile.good())
 	{
 		std::ofstream outfile("commentDB.txt");
-        if (!outfile.is_open()) 
+        if (!outfile.is_open())
 		{
             std::cout << "Error creating file!\n";
             return;
@@ -825,7 +832,7 @@ void	Server::executePost(Request& req)
 		outfile.close();
 	}
 	std::ofstream file("commentDB.txt", std::ios_base::app);
-    if (!file.is_open()) 
+    if (!file.is_open())
 	{
         std::cout << "Error opening file!\n";
         return;
@@ -843,7 +850,7 @@ void	Server::executePost(Request& req)
 
 /**
  * @brief Deletes the "commentDB.txt" file.
- * 
+ *
  * This function attempts to delete the "commentDB.txt" file from the filesystem.
  * If the deletion is successful, it prints a success message; otherwise, it prints an error message.
  */
@@ -860,15 +867,15 @@ void	Server::executeDeleteFile()
 
 /**
  * @brief Processes and sends responses to client requests.
- * 
+ *
  * This function handles incoming client requests, processes them, and sends appropriate responses back to the client.
  * It performs various checks such as request parsing, CGI execution, file operations, and error handling.
  * The response is generated based on the requested URI, method, and server configuration settings.
- * 
+ *
  * @param socket The file descriptor of the client socket.
  * @return int Always returns 0 to indicate successful completion.
  */
-int	Server::sender(int socket) 
+int	Server::sender(int socket)
 {
 	std::string locationRoot;
 	std::string uri;
@@ -883,49 +890,52 @@ int	Server::sender(int socket)
 	if (req._isRequestComplete)
 		return (0);
 	resp.defaultFlags();
-	if (req.fillHeader(fd) != -1) 
+	if (req.fillHeader(fd))
 	{
-		if (req._isRequestComplete) 
+		if (req._isRequestComplete)
 		{
 			reqCode = 200;
-			resp.sendResponse(this, fd, resp.getErrorPage(reqCode, getConf()), reqCode);
+			if (resp.sendResponse(this, fd, resp.getErrorPage(reqCode, getConf()), reqCode) < 0)
+				return -1;
 			//return (0);
 		}
 	}
-	else
-		return -1;
 	// Check request size
 	reqCode = req.checkClientBodySize(this);
-	if (reqCode != 413) 
+	if (reqCode != 413)
 	{
 		// Parse the request URI, METHOD and HTTP VERSION. Returns appropriate response codes
 		reqCode = req.ConfigureRequest(this);
 		std::string host(req.getHost());
-		std::cout << "host is: " << host << std::endl;
 		std::size_t pos = host.find(':');
 		if (pos != std::string::npos)
 			host = host.substr(0, pos);
 		if (host == "localhost" || host == "127.0.0.1") {}
-		else if (std::find(_serverConfig.server_name.begin(), _serverConfig.server_name.end(), host) == _serverConfig.server_name.end()) 
+		else if (std::find(_serverConfig.server_name.begin(), _serverConfig.server_name.end(), host) == _serverConfig.server_name.end())
 		{
-			resp.sendResponse(this, fd, resp.getErrorPage(400, getConf()), 400);
+			if (resp.sendResponse(this, fd, resp.getErrorPage(400, getConf()), 400) < 0)
+				return -1;
 			return (0);
 		}
 		uri = req.getURI();
 		if (reqCode != 200)
 		{
-			resp.sendResponse(this, fd, resp.getErrorPage(reqCode, getConf()), reqCode);
+			if (resp.sendResponse(this, fd, resp.getErrorPage(reqCode, getConf()), reqCode) < 0)
+				return -1;
 			return (0);
 		}
 		int cgi = CGI(uri, fd, req, resp, reqCode);
-		if (_isCGI == true) 
+		if(cgi < 0)
+			return -1;
+		if (_isCGI == true)
 		{
 			_isCGI = false;
 			return 0;
 		}
 		else if (cgi == 405 || cgi == 404)
 		{
-			resp.sendResponse(this, fd, resp.getErrorPage(cgi, _serverConfig), cgi);
+			if (resp.sendResponse(this, fd, resp.getErrorPage(cgi, _serverConfig), cgi) < 0)
+				return -1;
 			_isCGI = false;
 			return (0);
 		}
@@ -939,14 +949,14 @@ int	Server::sender(int socket)
 		// Find the subdirectory root if it exists, or receive '404 Page Not Found' / '400 Bad Request'
 		locationRoot = resp.findRoot(this, uri);
 		// Check if we're trying to access directly a file, if we are, remove the last part of the file in the URI
-		if (locationRoot == "404" || locationRoot == "400") 
+		if (locationRoot == "404" || locationRoot == "400")
 		{
 			std::string uri_tmp;
 			// Ignore last / of uri
 			if (uri.find_last_of('/') != 0 && uri.find_last_of('/') == uri.length() - 1)
 				uri.erase(uri.find_last_of('/'));
 			size_t lastSlashIndex = uri.find_last_of('/');
-			if (lastSlashIndex != std::string::npos && lastSlashIndex != 0 && uri.size() >= 2) 
+			if (lastSlashIndex != std::string::npos && lastSlashIndex != 0 && uri.size() >= 2)
 			{
 				uri_tmp = uri.substr(0, lastSlashIndex);
 				possibleIndex = uri.substr(lastSlashIndex + 1);
@@ -954,7 +964,7 @@ int	Server::sender(int socket)
                     uri_tmp.erase(uri_tmp.size() - 1);
 			}
 			// This is in case we're trying to access a file directly at root level
-			else if (uri.find_first_of('/') == uri.find_last_of('/')) 
+			else if (uri.find_first_of('/') == uri.find_last_of('/'))
 			{
 				uri_tmp = "/";
 				possibleIndex = uri.substr(1, std::string::npos);
@@ -974,11 +984,12 @@ int	Server::sender(int socket)
 	}
 	end:
 	// Here we check if any previous function have returned an error
-	if (reqCode != 200 && reqCode != 202) 
+	if (reqCode != 200 && reqCode != 202)
 	{
 		// Finding the correct error page file path and sending the appropriate response
 		std::string errorPath = resp.getErrorPage(reqCode, this->_serverConfig);
-		resp.sendResponse(this, fd, errorPath, reqCode);
+		if (resp.sendResponse(this, fd, errorPath, reqCode) < 0)
+			return -1;
 		return 0;
 	}
 	// If the current response code is '200 OK', initialize the parameters that we will use to send a response. By default server's root settings
@@ -988,12 +999,12 @@ int	Server::sender(int socket)
 	// Static bool for savestate related to request generated via directory list
 	static bool wasListed;
 	// If previously we have found a subdirectory location
-	if (!locationRoot.empty()) 
+	if (!locationRoot.empty())
 	{
 		LocationDir* dir = resp.getDir(this, uri);
 		// Check if the subdirectory has index defined. If it doesn't use the root settings
 		// If the subdirectory is a redirect it won't have index, but we have a check for this further down the line
-		if (!dir->index.empty() || !possibleIndex.empty() || wasListed) 
+		if (!dir->index.empty() || !possibleIndex.empty() || wasListed)
 		{
 			indexSize = dir->index.size();
 			indexes = dir->index;
@@ -1007,7 +1018,7 @@ int	Server::sender(int socket)
 	std::string path = resp.selectIndexFile(this, fd, indexes, indexSize, rootPath, uri, !dir || dir->autoindex, possibleIndex);
 	// Init wasListed to false
 	wasListed = false;
-	if (path == "LIST") 
+	if (path == "LIST")
 	{
 		int l_files = resp.generateDirListing(this, fd, "./var/www/html/" + locationRoot);
 
@@ -1018,18 +1029,27 @@ int	Server::sender(int socket)
 		wasListed = true;
 	}
 	// Basic checks if indexFile is empty, we have a redirect, or path has an error
-	else 
+	else
 	{
-			if ((_serverConfig.indexFile.empty() && !resp.getRedirectFlag()) || path == "404" || path == "400") 
+			if ((_serverConfig.indexFile.empty() && !resp.getRedirectFlag()) || path == "404" || path == "400")
 			{
 				// Check path if path is a Bad Request, if not default to Page Not Found
 				if (path == "400" || path == "404")
-					resp.sendResponse(this, fd, resp.getErrorPage(atoi(path.c_str()), getConf()), atoi(path.c_str()));
+				{
+					if (resp.sendResponse(this, fd, resp.getErrorPage(atoi(path.c_str()), getConf()), atoi(path.c_str())) < 0)
+						return -1;
+				}
 				else
-					resp.sendResponse(this, fd, resp.getErrorPage(200, getConf()), 200);
+				{
+					if (resp.sendResponse(this, fd, resp.getErrorPage(200, getConf()), 200) < 0)
+						return -1;
+				}
 			}
 			else
-				resp.sendResponse(this, fd, (path + _serverConfig.indexFile), reqCode);
+			{
+				if (resp.sendResponse(this, fd, (path + _serverConfig.indexFile), reqCode) < 0)
+					return -1;
+			}
 	}
 	// If indexes were added via dir listing, remove them so we can access the list again recursively in the browser
 	if (wasListed)
@@ -1040,13 +1060,13 @@ int	Server::sender(int socket)
 
 /**
  * @brief Closes a connection and removes it from the epoll event loop.
- * 
+ *
  * This function closes the specified file descriptor (fd) and removes it from the epoll event loop.
  * It iterates over the event buffer to find the corresponding event and removes it using epoll_ctl.
  * Additionally, it removes the connection from the server's list of open connections (_connectionsVector),
  * erases the file descriptor from the ServerMap to prevent repeated entries, and resets the
  * file descriptor's activity in the TimeMap.
- * 
+ *
  * @param fd The file descriptor of the connection to be closed.
  * @param epoll_fd The file descriptor of the epoll instance.
  * @param event_buffer A buffer containing epoll events.
@@ -1056,9 +1076,9 @@ int	Server::sender(int socket)
  */
 int		Server::closeConnections(int fd, int epoll_fd, struct epoll_event* event_buffer, std::map<int, Server*>& ServerMap, std::map<int, time_t>& TimeMap) {
 
-	for (int i = 0; i < MAX_EVENT_BUFFER; i++) 
+	for (int i = 0; i < MAX_EVENT_BUFFER; i++)
 	{
-		if (event_buffer[i].data.fd == fd) 
+		if (event_buffer[i].data.fd == fd)
 		{
 			if (epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, &event_buffer[i]) < 0)
 				throw ServerException("fd could not be closed.");
@@ -1067,7 +1087,7 @@ int		Server::closeConnections(int fd, int epoll_fd, struct epoll_event* event_bu
 	}
 	close(fd);
 	std::vector<Connection>::iterator it;
-	for (it = _connectionsVector.begin(); it != _connectionsVector.end();) 
+	for (it = _connectionsVector.begin(); it != _connectionsVector.end();)
 	{
 		if (it->getConnectionFD() == fd)
 			it = _connectionsVector.erase(it);
@@ -1083,15 +1103,15 @@ int		Server::closeConnections(int fd, int epoll_fd, struct epoll_event* event_bu
 
 /**
  * @brief Fills the body of the server configuration with words from a given istringstream.
- * 
+ *
  * This function reads words from the provided istringstream and appends them to the body of the server configuration.
  * It iterates through the stream until it reaches the end, pushing each word onto the body vector.
  * After filling the body, it performs a check for balanced curly brackets in the body.
- * 
+ *
  * @param iss The istringstream containing words to be added to the body.
  * @return int Always returns 0 to indicate successful completion.
  */
-int	Server::bodyFiller(std::istringstream& iss) 
+int	Server::bodyFiller(std::istringstream& iss)
 {
 	std::string word;
 	while (iss >> word)
@@ -1105,11 +1125,11 @@ int	Server::bodyFiller(std::istringstream& iss)
 
 /**
  * @brief Checks if the body of the server configuration has balanced curly brackets.
- * 
+ *
  * This function checks if the body of the server configuration has balanced curly brackets.
  * It iterates through the body vector, maintaining a stack to keep track of opening and closing curly brackets.
  * After iterating through the body, it ensures that the stack is empty and returns a status code accordingly.
- * 
+ *
  * @return int Returns 0 if the body has balanced curly brackets, otherwise returns -1.
  */
 int		Server::bracketChecker()
@@ -1119,7 +1139,7 @@ int		Server::bracketChecker()
 	std::vector<std::string> stack;
 	if (*itb != "server")
 		return (-1);
-	while (itb != ite) 
+	while (itb != ite)
 	{
 	  	if (*itb == "{" || *itb == "}")
 	    	stack.push_back(*itb);
@@ -1128,7 +1148,7 @@ int		Server::bracketChecker()
 	std::vector<std::string>::iterator it;
 	if (stack.size() % 2 != 0)
 	  	return (-1);
-	for (it = stack.begin(); it != stack.end() && stack.size() > 2; it++) 
+	for (it = stack.begin(); it != stack.end() && stack.size() > 2; it++)
 	{
 	  	if ((*it).length() != 1)
 	  	  return (-1);
@@ -1151,7 +1171,7 @@ int		Server::bracketChecker()
 
 /* ===================== Exceptions ===================== */
 
-Server::ServerException::ServerException(const std::string& error) 
+Server::ServerException::ServerException(const std::string& error)
 {
 	std::ostringstream err;
 	err << BOLD << RED << "Error: " << error << RESET;
@@ -1160,14 +1180,14 @@ Server::ServerException::ServerException(const std::string& error)
 
 Server::ServerException::~ServerException() throw() {}
 
-const char* Server::ServerException::what() const throw () 
+const char* Server::ServerException::what() const throw ()
 {
 	return (_errMessage.c_str());
 }
 
 /* ===================== Overloaders ===================== */
 
-std::ostream& operator<<(std::ostream& os, const Server& server) 
+std::ostream& operator<<(std::ostream& os, const Server& server)
 {
 	os << "listen: " << server.getListen().host << ":" << server.getListen().port << std::endl;
 	os << "server_name: " << server.getConf().server_name.back() << std::endl;
@@ -1192,18 +1212,18 @@ std::ostream& operator<<(std::ostream& os, const Server& server)
 
 /**
  * @brief Fills the CGI environment variables for a POST request.
- * 
+ *
  * This function populates the CGI environment variables required for processing a POST request by a CGI script.
  * It takes the server configuration, request URI, request object, and a structure to hold the environment variables as input.
  * Based on the provided inputs, it sets various CGI environment variables such as CONTENT_LENGTH, CONTENT_TYPE, REQUEST_METHOD, etc.
  * The populated environment variables are stored in the provided t_cgi_env structure.
- * 
+ *
  * @param svConf The server configuration containing relevant information.
  * @param uri The URI associated with the request.
  * @param envp The structure to hold the CGI environment variables.
  * @param req The request object containing request details.
  */
-void    envCGI(const t_server_config& svConf, const std::string& uri, t_cgi_env& envp, Request& req) 
+void    envCGI(const t_server_config& svConf, const std::string& uri, t_cgi_env& envp, Request& req)
 {
     envp.content_length = "CONTENT_LENGTH=" + req.getContentLen();
     envp.content_type = "CONTENT_TYPE=" + req.getContentType();
