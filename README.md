@@ -125,5 +125,5 @@ server {
 ## Contributors
 
 I would like to thank to my amazing colleagues who worked on this project with me. Your dedication, collaboration, and expertise made this journey sucessful and very enjoyable. Thank you for your hard work and teamwork!
-- [José Gonçalves](https://github.com/lubuper)
-- [Luís Pereira](https://github.com/ZPedro99)
+- [José Gonçalves](https://github.com/ZPedro99)
+- [Luís Pereira](https://github.com/lubuper)
